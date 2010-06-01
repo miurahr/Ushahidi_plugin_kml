@@ -11,7 +11,7 @@ author website: http://www.dkfactor.com
 == Description ==
 
 == Installation ==
-1. Copy the entire /actionable/ directory into your /plugins/ directory.
+1. Copy the entire /kml/ directory into your /plugins/ directory.
 2. Activate the plugin.
 
 == Changelog ==
