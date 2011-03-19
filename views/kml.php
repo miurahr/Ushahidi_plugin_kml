@@ -6,10 +6,12 @@
 //=== Option Variables ==
 //--- File Options --
 $upload_directory = url::base() . "media/uploads/";  // external URL for Ushahidi uploads directory
-$kml_filename = "latest.kml";  // filename for exported KML file
-$kmz_filename = "latest.kmz";  // filename for exported KMZ file
-$kmlFileName = Kohana::config('upload.directory', TRUE) . $kml_filename;  // internal path to KML file in uploads directory
-$kmzFileName = Kohana::config('upload.directory', TRUE)  . $kmz_filename;  // internal path to KMZ file in uploads directory
+
+// move to controller
+//$kml_filename = "latest.kml";  // filename for exported KML file
+//$kmz_filename = "latest.kmz";  // filename for exported KMZ file
+//$kmlFileName = Kohana::config('upload.directory', TRUE) . $kml_filename;  // internal path to KML file in uploads directory
+//$kmzFileName = Kohana::config('upload.directory', TRUE)  . $kmz_filename;  // internal path to KMZ file in uploads directory
 //--- Balloon Options --
 $placemark_balloon_width = "340";  // width in pixels (suggest 200 to 500)
 $document_balloon_width = "340";  // width in pixels (suggest 200 to 500)
@@ -35,8 +37,8 @@ $bundle_media_tumbs = true;	// True/False, true = bundle media thumbnail images 
 $options = array("upload_directory"=>$upload_directory, "kml_filename"=>$kml_filename, "kmz_filename"=>$kmz_filename, "kmlFileName"=>$kmlFileName, "kmzFileName"=>$kmzFileName, "placemark_balloon_width"=>$placemark_balloon_width, "document_balloon_width"=>$document_balloon_width, "title_text_color"=>$title_text_color, "verified_text_color"=>$verified_text_color, "description_text_color"=>$description_text_color, "location_text_color"=>$location_text_color, "categories_text_color"=>$categories_text_color, "date_text_color"=>$date_text_color, "verified_in_balloons"=>$verified_in_balloons, "media_in_balloons"=>$media_in_balloons, "location_in_balloons"=>$location_in_balloons, "cats_in_balloons"=>$cats_in_balloons, "cat_parents"=>$cat_parents, "cat_icon_size"=>$cat_icon_size, "folder_snippets"=>$folder_snippets, "visibility"=>$visibility, "extended_data"=>$extended_data, "bundle_icons"=>$bundle_icons, "bundle_media_tumbs"=>$bundle_media_tumbs);
 
 //=== Caching Options ==
-$cache_secs = 120; 	// seconds during which to serve cached file, after which re-generate on next request
-$cache_on = true; 	// true = cache file, false = debug mode: file is re-generated on each request
+//$cache_secs = 120; 	// seconds during which to serve cached file, after which re-generate on next request
+//$cache_on = true; 	// true = cache file, false = debug mode: file is re-generated on each request
 
 //=== Logo Details == (image file for in balloons: png/jpg/gif; suggested size: 36 x 36 pixels)
 $logo_path = url::base() . "plugins/kml/views/";
@@ -629,8 +631,10 @@ function write_kml_data($kmlFile, $items, $catID_to_incidents, $cat_to_subcats, 
 // TOD: Add something to check if new incidents have come in and re-create files only if needed?
 
 // If file was modified in last X=$cache_time seconds (and debug mode off), don't bother re-generating
-if (file_exists($kmzFileName) && (time() - filemtime($kmzFileName) < $cache_secs) && $cache_on) {
+//if (file_exists($kmzFileName) && (time() - filemtime($kmzFileName) < $cache_secs) && $cache_on) {
 //if (file_exists($kmzFileName) && (time() - filemtime($kmzFileName) < $cache_secs) && $debug_cache_off = false) {
+if ($use_cache)
+{
 	kohana::log('info', "returning cached kmz");
 }
 else {

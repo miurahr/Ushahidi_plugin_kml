@@ -22,30 +22,78 @@ class Kml_Controller extends Controller
 {
 	public function index()
 	{
-		// Get Incidents...
-		// See if limit parameter "l" is set
+		// 1. get limit
+		// 2. set filename
+		// 3. ditect cache
+		// 4.1. has cache -> return file
+		// 4.2. no cache -> get data from sql, and write in view
+
+		// 1.
+		$limit = 0;
 		if (isset($_GET['l']) AND !empty($_GET['l']))
 		{
 			$limit = (int) $_GET['l'];
-			// If so, Get all incidents upto limit
-			$incidents = ORM::factory('incident')
-			->where('incident_active', '1')
-			->orderby('incident_date', 'desc')
-			->limit($limit)
-			->find_all();
+		}
+		
+		// 2.
+		$kml_filename = "latest.kml";  // filename for exported KML file
+		$kmz_filename = "latest.kmz";  // filename for exported KMZ file
+
+		if ($limit != 0) 
+		{
+			$kml_filename = $kml_filename + "_" + strval($limit);
+			$kmz_filename = $kmz_filename + "_" + strval($limit);
+		}
+
+		$kmlFileName = Kohana::config('upload.directory', TRUE) . $kml_filename;  // internal path to KML file in uploads directory
+		$kmzFileName = Kohana::config('upload.directory', TRUE)  . $kmz_filename;  // internal path to KMZ file in uploads directory
+
+		// 3.
+
+		//=== Caching Options ==
+		$cache_secs = 120; 	// seconds during which to serve cached file, after which re-generate on next request
+		$cache_on = true; 	// true = cache file, false = debug mode: file is re-generated on each request
+
+		$use_cache = false;
+
+		if (file_exists($kmzFileName) && (time() - filemtime($kmzFileName) < $cache_secs) && $cache_on) {
+			$use_cache = true;
+		}
+		
+		// 4.
+		if ($use_cache)
+		{
+			// 4.1
+			$incidents = NULL;
+			$categories = NULL;
+			
 		}
 		else
 		{
-			// Otherwise, Get all incidents (no limit)
-			$incidents = ORM::factory('incident')
-			->where('incident_active', '1')
-			->orderby('incident_date', 'desc')
-			->find_all();
+			// 4.2
+			if ($limit != 0) 
+			{
+				// If so, Get all incidents upto limit
+				$incidents = ORM::factory('incident')
+					->where('incident_active', '1')
+					->orderby('incident_date', 'desc')
+					->limit($limit)
+					->find_all();
+			}
+			else
+			{
+				// Otherwise, Get all incidents (no limit)
+				$incidents = ORM::factory('incident')
+					->where('incident_active', '1')
+					->orderby('incident_date', 'desc')
+					->find_all();
+			}
+			// Get all Categories...
+			$categories = ORM::factory('category')
+				->where('category_visible', '1')
+				->find_all();
+
 		}
-		// Get all Categories...
-		$categories = ORM::factory('category')
-			->where('category_visible', '1')
-			->find_all();
 		
 		//header("Content-Type: application/vnd.google-earth.kml+xml");
 		header("Content-Type: application/vnd.google-earth.kmz");
@@ -61,6 +109,17 @@ class Kml_Controller extends Controller
 		$view->kml_tagline = htmlspecialchars(Kohana::config('settings.site_tagline'));
 		$view->items = $incidents;
 		$view->categories = $categories;
+
+		// move from view
+		$view->kml_filename = $kml_filename;
+		$view->kmz_filename = $kmz_filename;
+		$view->kmlFileName = $kmlFileName;
+		$view->kmzFileName = $kmzFileName;
+		
+
+		// set use cache
+		$view->use_cache = $use_cache;
+
 		$view->render(TRUE);
 	}
 }
