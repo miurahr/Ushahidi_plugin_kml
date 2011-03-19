@@ -41,8 +41,8 @@ class Kml_Controller extends Controller
 
 		if ($limit != 0) 
 		{
-			$kml_filename = $kml_filename + "_" + strval($limit);
-			$kmz_filename = $kmz_filename + "_" + strval($limit);
+			$kml_filename = $kml_filename . "_" . strval($limit);
+			$kmz_filename = $kmz_filename . "_" . strval($limit);
 		}
 
 		$kmlFileName = Kohana::config('upload.directory', TRUE) . $kml_filename;  // internal path to KML file in uploads directory
