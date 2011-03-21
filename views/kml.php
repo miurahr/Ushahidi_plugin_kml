@@ -669,7 +669,7 @@ else {
 //readfile($kmlFileName);
 if ( ! $cron_flag )
 {
-    readfile($kmzFileName);
+	readfile($kmzFileName);
 }
 
 
