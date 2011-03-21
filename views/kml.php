@@ -667,7 +667,10 @@ else {
 
 //=== Read file out to user ==
 //readfile($kmlFileName);
-readfile($kmzFileName);
+if ( ! $cron_flag )
+{
+    readfile($kmzFileName);
+}
 
 
 //=== TODO ===================

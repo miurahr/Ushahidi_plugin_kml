@@ -34,7 +34,15 @@ class Kml_Controller extends Controller
 		{
 			$limit = (int) $_GET['l'];
 		}
-		
+
+        // cron on?
+        $cron_flag = false;
+        if (isset($_GET['cron']) AND !empty($_GET['cron']))
+        {
+            $cron_flag = true;
+            $limit = 0; // execute cron with no limit.
+        }
+
 		// 2.
 		$kml_filename = "latest.kml";  // filename for exported KML file
 		$kmz_filename = "latest.kmz";  // filename for exported KMZ file
@@ -119,6 +127,9 @@ class Kml_Controller extends Controller
 
 		// set use cache
 		$view->use_cache = $use_cache;
+
+        // set cron flag
+        $view->cron_flag = $cron_flag;
 
 		$view->render(TRUE);
 	}
