@@ -495,7 +495,7 @@ function create_kmz($kmlFileName, $kmzFileName){
 	kohana::log('info', "generating kmz file");
 	$zip = new ZipArchive();
 
-	if ($zip->open("$kmzFileName", ZIPARCHIVE::CREATE)!==TRUE) {
+	if ($zip->open("$kmzFileName", ZIPARCHIVE::CREATE|ZIPARCHIVE::OVERWRITE)!==TRUE) {
 		kohana::log('error', "cannot open kmz file");
 		echo("cannot open <". $kmzFileName .">\n");
 	}
