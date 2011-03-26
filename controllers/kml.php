@@ -28,6 +28,8 @@ class Kml_Controller extends Controller
 		// 4.1. has cache -> return file
 		// 4.2. no cache -> get data from sql, and write in view
 
+        // $cdn_kmlurl = "http://cdn.sinsai.info.cache.yimg.jp/ushahidi/media/uploads/latest.kmz";
+
 		// 1.
 		$limit = 0;
 		if (isset($_GET['l']) AND !empty($_GET['l']))
@@ -42,6 +44,11 @@ class Kml_Controller extends Controller
 			$cron_flag = true;
 			$limit = 0; // execute cron with no limit.
 		}
+
+        if ($limit == 0 && cron_flag == false) {
+            Kohana::config_load('kml');
+            url::redirect(Kohana::config("kml.cdn_kml_url"));
+        }
 
 		// 2.
 		$kml_filename = "latest.kml";  // filename for exported KML file
