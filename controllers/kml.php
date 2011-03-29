@@ -64,7 +64,7 @@ class Kml_Controller extends Controller
 		// 3.
 
 		//=== Caching Options ==
-		$cache_secs = 120; 	// seconds during which to serve cached file, after which re-generate on next request
+		$cache_secs = 60; 	// seconds during which to serve cached file, after which re-generate on next request
 		$cache_on = true; 	// true = cache file, false = debug mode: file is re-generated on each request
 
 		$use_cache = false;
