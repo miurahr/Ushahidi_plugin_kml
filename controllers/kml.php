@@ -35,6 +35,11 @@ class Kml_Controller extends Controller
 			$limit = (int) $_GET['l'];
 		}
 
+		$category_id = 0;
+		if (isset($_GET['cat']) AND !empty($_GET['cat'])) {
+			$category_id = (int) $_GET['cat'];
+		}
+
 		// cron on?
 		$cron_flag = false;
 		if (isset($_GET['cron']) AND !empty($_GET['cron']))
@@ -102,9 +107,14 @@ class Kml_Controller extends Controller
 					->find_all();
 			}
 			// Get all Categories...
-			$categories = ORM::factory('category')
-				->where('category_visible', '1')
-				->find_all();
+			$categories = array();
+			if ($category_id == 0) {
+				$categories = ORM::factory('category')
+					->where('category_visible', '1')
+					->find_all();
+			} else {
+				$categories = ORM::factory('category', $category_id);
+			}
 
 		}
 		
