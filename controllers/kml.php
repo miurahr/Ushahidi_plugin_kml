@@ -113,7 +113,10 @@ class Kml_Controller extends Controller
 					->where('category_visible', '1')
 					->find_all();
 			} else {
-				$categories = ORM::factory('category', $category_id);
+				$categories = ORM::factory('category')
+					->where('id', $category_id)
+					->where('category_visible', '1')
+					->find_all();
 			}
 
 		}
