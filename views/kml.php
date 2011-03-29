@@ -5,7 +5,8 @@
 
 //=== Option Variables ==
 //--- File Options --
-$upload_directory = url::base() . "media/uploads/";  // external URL for Ushahidi uploads directory
+$urlbase = Kohana::config("kml.kmlsite");
+$upload_directory = $urlbase . "media/uploads/";  // external URL for Ushahidi uploads directory
 
 // move to controller
 //$kml_filename = "latest.kml";  // filename for exported KML file
@@ -41,7 +42,7 @@ $options = array("upload_directory"=>$upload_directory, "kml_filename"=>$kml_fil
 //$cache_on = true; 	// true = cache file, false = debug mode: file is re-generated on each request
 
 //=== Logo Details == (image file for in balloons: png/jpg/gif; suggested size: 36 x 36 pixels)
-$logo_path = url::base() . "plugins/kml/views/";
+$logo_path = $urlbase . "plugins/kml/views/";
 $logo_filename = "logo_36x36.png";
 $logo_width = 36;
 $logo_height = 36;
@@ -73,16 +74,16 @@ function write_kml_head($kmlFile, $kml_name, $kml_tagline, $options) {
 	"		<description>" . PHP_EOL .
 	"			<![CDATA[<table width='" . $options["document_balloon_width"] . "' cellpadding='0' cellspacing='0'><tr><td>" . PHP_EOL .
 	"			<p><strong>" . $kml_tagline . "</strong></p>" . PHP_EOL .
-	"			<a href='" . url::base() . "'>" . url::base() . "</a><br />" . PHP_EOL .
+	"			<a href='" . $urlbase . "'>" . $urlbase . "</a><br />" . PHP_EOL .
 	"			<p>Note: Reports are represented by multiple placemarks if they are in multiple categories.</p>" . PHP_EOL .
 	"			<p style='color:" . $options["date_text_color"] . "; '><strong>This kml last updated</strong>: " . gmdate("D, d M Y H:i:s") . " GMT</p>" . PHP_EOL .
 	//"			<p>Static KML file for offline use: <a href='" . $options["upload_directory"] . $options["kmz_filename"] . "'>" . $options["kmz_filename"] . "</a></p>" . PHP_EOL .
 	"			<hr />" . PHP_EOL .
 	"			<table width='100%' cellpadding='0' cellspacing='0'><tr><td align='left'>" . PHP_EOL .
-	"				<img src='" . url::base() . "plugins/kml/views/logo_36x36.png' width='36' height='36' />" . PHP_EOL .
+	"				<img src='" . $urlbase . "plugins/kml/views/logo_36x36.png' width='36' height='36' />" . PHP_EOL .
 	"			</td><td align='right'>" . PHP_EOL .
-	"				<a href='" . url::base() . "'><strong>" . url::base() . "</strong></a><br />" . PHP_EOL .
-	"				<a href='" . url::base() . "reports/submit/'>Submit a new report</a>" . PHP_EOL .
+	"				<a href='" . $urlbase . "'><strong>" . $urlbase . "</strong></a><br />" . PHP_EOL .
+	"				<a href='" . $urlbase . "reports/submit/'>Submit a new report</a>" . PHP_EOL .
 	"			</td></tr></table>" . PHP_EOL .
 	"			</td></tr></table>]]>" . PHP_EOL .								
 	"		</description>" . PHP_EOL .
@@ -90,7 +91,7 @@ function write_kml_head($kmlFile, $kml_name, $kml_tagline, $options) {
 	"		<Style id='style_top_document'>" . PHP_EOL .
 	"			<ListStyle>" . PHP_EOL .
 	"				<ItemIcon>" . PHP_EOL .
-	"					<href>" . htmlspecialchars(url::base() . "plugins/kml/views/logo_36x36.png") . "</href>" . PHP_EOL .
+	"					<href>" . htmlspecialchars($urlbase . "plugins/kml/views/logo_36x36.png") . "</href>" . PHP_EOL .
 	"				</ItemIcon>" . PHP_EOL .
 	"				<maxSnippetLines>1</maxSnippetLines>" . PHP_EOL .
 	"			</ListStyle>" . PHP_EOL .
@@ -236,7 +237,7 @@ function write_placemark($kmlFile, $item, $cat_id, $catID_data, $catID_icons, $l
 	"							<table width='100%' cellpadding='0' cellspacing='0'><tr><td align='left' style='color:" . $options["date_text_color"] . "; '>" . PHP_EOL .
 	"								<strong>Submitted:</strong> " . $item->incident_date . PHP_EOL .
 	"							</td><td align='right'>" . PHP_EOL .
-	"								<a href='" . url::base().'reports/view/'.$item->id . "'>More Information</a>" . PHP_EOL .
+	"								<a href='" . $urlbase.'reports/view/'.$item->id . "'>More Information</a>" . PHP_EOL .
 	"							</td></tr></table>" . PHP_EOL .
 	"						</td></tr>" . PHP_EOL .
 	"						<tr><td><hr /></td></tr>" . PHP_EOL .
@@ -244,8 +245,8 @@ function write_placemark($kmlFile, $item, $cat_id, $catID_data, $catID_icons, $l
 	"							<table width='100%' cellpadding='0' cellspacing='0'><tr><td align='left' width='" . $logo["width"] . "px'>" . PHP_EOL .
 	"								<img src='" . $logo["path"] . $logo["filename"] . "' width='" . $logo["width"] . "' height='" . $logo["height"] . "' />" . PHP_EOL .
 	"							</td><td colspan='2' align='right'>" . PHP_EOL .
-	"								<a href='" . url::base() . "'><strong>" . url::base() . "</strong></a><br />" . PHP_EOL .
-	"								<a href='" . url::base() . "reports/submit/'>Submit a new report</a>" . PHP_EOL .
+	"								<a href='" . $urlbase . "'><strong>" . $urlbase . "</strong></a><br />" . PHP_EOL .
+	"								<a href='" . $urlbase . "reports/submit/'>Submit a new report</a>" . PHP_EOL .
 	"							</td></tr></table>" . PHP_EOL .
 	"						</td></tr>" . PHP_EOL .
 	"					</table>]]>" . PHP_EOL .
@@ -269,7 +270,7 @@ function generate_extended_data($item, $cat_id, $categories_string, $options) {
 		"					<Data name='report_title'><value><![CDATA[" . htmlspecialchars($item->incident_title) . "]]></value></Data>" . PHP_EOL .
 		"					<Data name='report_description'><value><![CDATA[" . htmlspecialchars($item->incident_description) . "]]></value></Data>" . PHP_EOL .
 		"					<Data name='report_date'><value><![CDATA[" . $item->incident_date . "]]></value></Data>" . PHP_EOL .
-		"					<Data name='report_url'><value><![CDATA[" . url::base() . "reports/view/" . $item->id . "]]></value></Data>" . PHP_EOL .
+		"					<Data name='report_url'><value><![CDATA[" . $urlbase . "reports/view/" . $item->id . "]]></value></Data>" . PHP_EOL .
 		"					<Data name='report_category'><value><![CDATA[" . $cat_id . "]]></value></Data>" . PHP_EOL .
 		"					<Data name='report_categories_string'><value><![CDATA[" . $categories_string . "]]></value></Data>" . PHP_EOL .
 		"					<Data name='report_location_string'><value><![CDATA[" . $item->location->location_name . "]]></value></Data>" . PHP_EOL .
@@ -312,8 +313,8 @@ function get_item_media($item) {
 					$item_media["image"] = $media->media_link;
 					$item_media["image_medium"] = $media->media_medium;
 					$item_media["image_thumb"] = $media->media_thumb;
-					$item_media_string .= "<td align='center'><a href='" . url::base() . "media/uploads/" . $media->media_link . "'><img src='" . url::base() . "media/uploads/" . $media->media_thumb . "' /></a>";
-					$item_media_string .= "<br /><a style='font-size:0.8em; ' href='" . url::base() . "media/uploads/" . $media->media_link . "'>full size</a></td>";
+					$item_media_string .= "<td align='center'><a href='" . $urlbase . "media/uploads/" . $media->media_link . "'><img src='" . $urlbase . "media/uploads/" . $media->media_thumb . "' /></a>";
+					$item_media_string .= "<br /><a style='font-size:0.8em; ' href='" . $urlbase . "media/uploads/" . $media->media_link . "'>full size</a></td>";
 					break;
 				case 2:
 					$item_media["video"] = $media->media_link;
@@ -390,14 +391,14 @@ function generate_categories_string($item, $catID_data, $catID_icons, $options) 
 						// If it's a top level category, write simple categories string
 						if ($item_category->parent_id == 0) {
 							$categories_string = "<strong style='vertical-align:middle;'>Category:</strong> &nbsp;&nbsp;";
-							$categories_string .= "<a href='" . url::base() . "reports/?c=" . $item_category->id . "'>";
+							$categories_string .= "<a href='" . $urlbase . "reports/?c=" . $item_category->id . "'>";
 							$categories_string .= "<img src='" . $catID_icons[$item_category->id]["cat_string"] . "' width='" . $cat_icon_size . "' height='" . $cat_icon_size . "' style='vertical-align:middle;' />";
 							$categories_string .= "</a>";
 						}
 						// If it's a sub category, write categories string with parent and sub
 						else {
 							$categories_string = "<strong style='vertical-align:middle;'>Category:</strong> &nbsp;&nbsp;";
-							$categories_string .= "<a href='" . url::base() . "reports/?c=" . $item_category->id . "'>";
+							$categories_string .= "<a href='" . $urlbase . "reports/?c=" . $item_category->id . "'>";
 							if($options["cat_parents"]) $categories_string .= "<img src='" . $catID_icons[$item_category->parent_id]["cat_string"] . "' width='" . $cat_icon_size . "' height='" . $cat_icon_size . "' style='vertical-align:middle;' /> ";
 							$categories_string .= "<img src='" . $catID_icons[$item_category->id]["cat_string"] . "' width='" . $cat_icon_size . "' height='" . $cat_icon_size . "' style='vertical-align:middle;' />";
 							$categories_string .= "</a>";
@@ -413,13 +414,13 @@ function generate_categories_string($item, $catID_data, $catID_icons, $options) 
 					if ($item_category->category_visible == 1) {
 						// If it's a top level category, write simple categories string
 						if ($item_category->parent_id == 0) {
-							$categories_string .= "<a href='" . url::base() . "reports/?c=" . $item_category->id . "'>";
+							$categories_string .= "<a href='" . $urlbase . "reports/?c=" . $item_category->id . "'>";
 							$categories_string .= "<img src='" . $catID_icons[$item_category->id]["cat_string"] . "' width='" . $cat_icon_size . "' height='" . $cat_icon_size . "' style='vertical-align:middle;' />";
 							$categories_string .= "</a> &nbsp;&nbsp;";
 						}
 						// If it's a sub category, write categories string with parent and sub
 						else {
-							$categories_string .= "<a href='" . url::base() . "reports/?c=" . $item_category->id . "'>";
+							$categories_string .= "<a href='" . $urlbase . "reports/?c=" . $item_category->id . "'>";
 							if($options["cat_parents"]) $categories_string .= "<img src='" . $catID_icons[$item_category->parent_id]["cat_string"] . "' width='" . $cat_icon_size . "' height='" . $cat_icon_size . "' style='vertical-align:middle;' /> ";
 							$categories_string .= "<img src='" . $catID_icons[$item_category->id]["cat_string"] . "' width='" . $cat_icon_size . "' height='" . $cat_icon_size . "' style='vertical-align:middle;' />";
 							$categories_string .= "</a> &nbsp;&nbsp;";
@@ -523,16 +524,16 @@ function process_categories($kmlFile, $categories, &$catID_icons, &$kml_styles, 
 		// if category image is set, then construct icon URLs using image and add to relevant array
 		if(isset($cat->category_image)) {
 			// if so, use it for the icon
-			$cat_icons["placemark"] = htmlspecialchars(url::base().'media/uploads/'.$cat->category_image);
-			$cat_icons["folder"] = htmlspecialchars(url::base().'media/uploads/'.$cat->category_image);
-			$cat_icons["cat_string"] = htmlspecialchars(url::base().'media/uploads/'.$cat->category_image_thumb);
+			$cat_icons["placemark"] = htmlspecialchars($urlbase.'media/uploads/'.$cat->category_image);
+			$cat_icons["folder"] = htmlspecialchars($urlbase.'media/uploads/'.$cat->category_image);
+			$cat_icons["cat_string"] = htmlspecialchars($urlbase.'media/uploads/'.$cat->category_image_thumb);
 		}
 		// otherwise, construct icons using swatch generator
 		else {
 			// otherwise, use a color swatch
-			$cat_icons["placemark"] = htmlspecialchars(url::base().'swatch/?t=cir&c='.$cat->category_color.'&b=000000&w=32&h=32');
-			$cat_icons["folder"] = htmlspecialchars(url::base().'swatch/?t=rec&c='.$cat->category_color.'&b=000000&w=32&h=32');
-			$cat_icons["cat_string"] = htmlspecialchars(url::base().'swatch/?t=rec&c='.$cat->category_color.'&b=000000&w=10&h=10');
+			$cat_icons["placemark"] = htmlspecialchars($urlbase.'swatch/?t=cir&c='.$cat->category_color.'&b=000000&w=32&h=32');
+			$cat_icons["folder"] = htmlspecialchars($urlbase.'swatch/?t=rec&c='.$cat->category_color.'&b=000000&w=32&h=32');
+			$cat_icons["cat_string"] = htmlspecialchars($urlbase.'swatch/?t=rec&c='.$cat->category_color.'&b=000000&w=10&h=10');
 		}
 		$catID_icons[$cat->id] = $cat_icons;
 		

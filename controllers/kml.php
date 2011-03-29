@@ -27,6 +27,7 @@ class Kml_Controller extends Controller
 		// 3. ditect cache
 		// 4.1. has cache -> return file
 		// 4.2. no cache -> get data from sql, and write in view
+        Kohana::config_load('kml');
 
 		// 1.
 		$limit = 0;
@@ -49,7 +50,6 @@ class Kml_Controller extends Controller
 		}
 
 		if ($limit == 0 && $cron_flag == false) {
-			Kohana::config_load('kml');
 			url::redirect(Kohana::config("kml.cdn_kml_url"));
 		}
 
