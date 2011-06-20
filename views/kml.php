@@ -81,7 +81,7 @@ function write_kml_head($kmlFile, $kml_name, $kml_tagline, $options) {
 	//"			<p>Static KML file for offline use: <a href='" . $options["upload_directory"] . $options["kmz_filename"] . "'>" . $options["kmz_filename"] . "</a></p>" . PHP_EOL .
 	"			<hr />" . PHP_EOL .
 	"			<table width='100%' cellpadding='0' cellspacing='0'><tr><td align='left'>" . PHP_EOL .
-	"				<img src='" . $urlbase . "plugins/kml/views/logo_36x36.png' width='36' height='36' />" . PHP_EOL .
+	"				<img src='" . $urlbase . "plugins/kml/views/sinsai_logo_36x36.png' width='36' height='36' />" . PHP_EOL .
 	"			</td><td align='right'>" . PHP_EOL .
 	"				<a href='" . $urlbase . "'><strong>" . $urlbase . "</strong></a><br />" . PHP_EOL .
 	"				<a href='" . $urlbase . "reports/submit/'>Submit a new report</a>" . PHP_EOL .
@@ -92,7 +92,7 @@ function write_kml_head($kmlFile, $kml_name, $kml_tagline, $options) {
 	"		<Style id='style_top_document'>" . PHP_EOL .
 	"			<ListStyle>" . PHP_EOL .
 	"				<ItemIcon>" . PHP_EOL .
-	"					<href>" . htmlspecialchars($urlbase . "plugins/kml/views/logo_36x36.png") . "</href>" . PHP_EOL .
+	"					<href>" . htmlspecialchars($urlbase . "plugins/kml/views/sinsai_logo_36x36.png") . "</href>" . PHP_EOL .
 	"				</ItemIcon>" . PHP_EOL .
 	"				<maxSnippetLines>1</maxSnippetLines>" . PHP_EOL .
 	"			</ListStyle>" . PHP_EOL .
