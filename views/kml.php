@@ -43,7 +43,7 @@ $options = array("upload_directory"=>$upload_directory, "kml_filename"=>$kml_fil
 
 //=== Logo Details == (image file for in balloons: png/jpg/gif; suggested size: 36 x 36 pixels)
 $logo_path = $urlbase . "plugins/kml/views/";
-$logo_filename = "logo_36x36.png";
+$logo_filename = "sinsai_logo_36x36.png";
 $logo_width = 36;
 $logo_height = 36;
 //--- load logo array --
