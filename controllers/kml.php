@@ -22,12 +22,25 @@ class Kml_Controller extends Controller
 {
 	public function index()
 	{
+		// 0. define default limitation for google maps
 		// 1. get limit
 		// 2. set filename
 		// 3. ditect cache
 		// 4.1. has cache -> return file
 		// 4.2. no cache -> get data from sql, and write in view
         Kohana::config_load('kml');
+
+		// 0.
+		// max file size :     3MB
+		// max raw KML size : 10MB
+		// max network link : 10
+		// max items        : 1000 <-- apply
+		// max items in view: 80
+		$default_limit = 1000;
+
+		// for sinsai.info real data
+		// 1000items  6.8MB in raw KML, 0.5MB in KMZ
+		// 1500items  9.8MB in raw KML, 1.3MB in KMZ
 
 		// 1.
 		$limit = 0;
@@ -47,9 +60,10 @@ class Kml_Controller extends Controller
 		{
 			$cron_flag = true;
 			$limit = 0; // execute cron with no limit.
+			//that become $limit = $default_limit;  execute cron with default limit.
 		}
 
-		if ($limit == 0 && $cron_flag == false) {
+		if ($limit == 0 && $cron_flag == false) { // normal request without limit
 			url::redirect(Kohana::config("kml.cdn_kml_url"));
 		}
 
@@ -57,10 +71,21 @@ class Kml_Controller extends Controller
 		$kml_filename = "latest.kml";  // filename for exported KML file
 		$kmz_filename = "latest.kmz";  // filename for exported KMZ file
 
-		if ($limit != 0) 
+		if ($limit == -1)
+		{
+			$kml_filename = $kml_filename . "_all";
+			$kmz_filename = $kmz_filename . "_all";
+			$limit = 0; // change to 0 that originaly mean  no limit.
+		}
+		elseif ($limit != 0) 
 		{
 			$kml_filename = $kml_filename . "_" . strval($limit);
 			$kmz_filename = $kmz_filename . "_" . strval($limit);
+		}
+		else
+		{ 
+			// cron request should do with $default_limit but name is without limitval.
+			$limit = $default_limit;
 		}
 
 		$kmlFileName = Kohana::config('upload.directory', TRUE) . $kml_filename;  // internal path to KML file in uploads directory

@@ -33,7 +33,7 @@ $folder_snippets = 0;  //  1/0, 1 = show category description as snippet (if des
 $visibility = 1;  //  1/0, 1 = placemarks & folders visible on initial load, 0 = not visible
 $extended_data = true;		// True/False, true = write extended data section in each placemark kml, false = No extended data
 $bundle_icons = true;	// True/False, true = bundle icon images into KMZ, false = link to images on server
-$bundle_media_tumbs = true;	// True/False, true = bundle media thumbnail images into KMZ, false = link to images on server
+$bundle_media_tumbs = false;	// True/False, true = bundle media thumbnail images into KMZ, false = link to images on server
 //--- load options array --
 $options = array("upload_directory"=>$upload_directory, "kml_filename"=>$kml_filename, "kmz_filename"=>$kmz_filename, "kmlFileName"=>$kmlFileName, "kmzFileName"=>$kmzFileName, "placemark_balloon_width"=>$placemark_balloon_width, "document_balloon_width"=>$document_balloon_width, "title_text_color"=>$title_text_color, "verified_text_color"=>$verified_text_color, "description_text_color"=>$description_text_color, "location_text_color"=>$location_text_color, "categories_text_color"=>$categories_text_color, "date_text_color"=>$date_text_color, "verified_in_balloons"=>$verified_in_balloons, "media_in_balloons"=>$media_in_balloons, "location_in_balloons"=>$location_in_balloons, "cats_in_balloons"=>$cats_in_balloons, "cat_parents"=>$cat_parents, "cat_icon_size"=>$cat_icon_size, "folder_snippets"=>$folder_snippets, "visibility"=>$visibility, "extended_data"=>$extended_data, "bundle_icons"=>$bundle_icons, "bundle_media_tumbs"=>$bundle_media_tumbs);
 
