@@ -226,7 +226,7 @@ function write_placemark($kmlFile, $item, $cat_id, $catID_data, $catID_icons, $l
 	$kml_placemark = "" .
 	"			<Placemark id='placemark_report_" . $item->id . "_cat_" . $cat_id . "'>" . PHP_EOL .
 	"				<name><![CDATA[" . htmlspecialchars($item->incident_title) . "]]></name>" . PHP_EOL .
-	"				<TimeStamp><when>" . preg_replace('/\s/', 'T', $item->incident_date) . "</when></TimeStamp>" . PHP_EOL .
+	"				<TimeStamp><when>" . preg_replace('/^(\d{2,4}-\d{1,2}-\d{1,2})\s(\d{1,2}:\d{1,2}:\d{1,2})$/',"$1T$2+09:00", $item->incident_date) . "</when></TimeStamp>" . PHP_EOL .
 	"				<snippet maxLines='0'></snippet>" . PHP_EOL .
 	"				<visibility>" . $options["visibility"] . "</visibility>" . PHP_EOL .
 	"				<styleUrl>#stylemap_categoryID_" . $cat_id . "</styleUrl>" . PHP_EOL .
