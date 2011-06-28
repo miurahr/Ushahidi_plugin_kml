@@ -28,7 +28,7 @@ class Kml_Controller extends Controller
 		// 3. ditect cache
 		// 4.1. has cache -> return file
 		// 4.2. no cache -> get data from sql, and write in view
-        Kohana::config_load('kml');
+		Kohana::config_load('kml');
 
 		// 0.
 		// max file size :     3MB
@@ -68,7 +68,8 @@ class Kml_Controller extends Controller
 			$cron_flag = false;
 		}
 
-		if ($limit == 0 && $cron_flag == false) { // normal request without limit
+		// use cdn when normal request without limit and category
+		if ($limit == 0 && $cron_flag == false && $category_id == 0) { 
 			url::redirect(Kohana::config("kml.cdn_kml_url"));
 		}
 
@@ -76,21 +77,42 @@ class Kml_Controller extends Controller
 		$kml_filename = "latest.kml";  // filename for exported KML file
 		$kmz_filename = "latest.kmz";  // filename for exported KMZ file
 
+		if ($category_id == 0)
+		{
+			$cat_name = "all_";
+		}
+		 elseif ($category_id > 0)
+		{
+			$cat_name = "cat".strval($category_id)."_";
+		}
+		else 
+		{
+			$cat_name = "";
+		}
+
 		if ($limit == -1)
 		{
-			$kml_filename = $kml_filename . "_all";
-			$kmz_filename = $kmz_filename . "_all";
+			$kml_filename = $cat_name."full_".$kml_filename;
+			$kmz_filename = $cat_name."full_".$kmz_filename;
 			$limit = 0; // change to 0 that originaly mean  no limit.
 		}
 		elseif ($limit != 0) 
 		{
-			$kml_filename = $kml_filename . "_" . strval($limit);
-			$kmz_filename = $kmz_filename . "_" . strval($limit);
+			$kml_filename = $cat_name.strval($limit)."_".$kml_filename;
+			$kmz_filename = $cat_name.strval($limit)."_".$kmz_filename;
+		}
+		elseif ($limit == 0 && $category_id == 0 && $cron_flag == true)
+		{ 
+			// cron default request should do with $default names and $default_limit.
+			$limit = $default_limit;
+			$kml_filename = $kml_filename;
+			$kmz_filename = $kmz_filename;
 		}
 		else
-		{ 
-			// cron request should do with $default_limit but name is without limitval.
+		{
 			$limit = $default_limit;
+			$kml_filename = $cat_name.$kml_filename;
+			$kmz_filename = $cat_name.$kml_filename;
 		}
 
 		$kmlFileName = Kohana::config('upload.directory', TRUE) . $kml_filename;  // internal path to KML file in uploads directory
@@ -159,7 +181,6 @@ class Kml_Controller extends Controller
 		header("Last-Modified: ".gmdate("D, d M Y H:i:s")." GMT");
 		header("Cache-Control: cache, must-revalidate");
 		header("Pragma: public");
-		
 		$view = new View("kml");
 		$view->kml_name = htmlspecialchars(Kohana::config('settings.site_name'));
 		$view->kml_tagline = htmlspecialchars(Kohana::config('settings.site_tagline'));
