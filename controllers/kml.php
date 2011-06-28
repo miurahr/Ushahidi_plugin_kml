@@ -43,24 +43,29 @@ class Kml_Controller extends Controller
 		// 1500items  9.8MB in raw KML, 1.3MB in KMZ
 
 		// 1.
-		$limit = 0;
 		if (isset($_GET['l']) AND !empty($_GET['l']))
 		{
-			$limit = (int) $_GET['l'];
+			$limit = $this->input->xss_clean($_GET['l']);
+			$limit = (isset($limit) AND intval($limit) >0)?intval($limit):0;
+		} else {
+			$limit = 0;
 		}
 
-		$category_id = 0;
 		if (isset($_GET['cat']) AND !empty($_GET['cat'])) {
-			$category_id = (int) $_GET['cat'];
+			$category_id = $this->input->xss_clean($_GET['cat']);
+			$category_id = (isset($category_id) AND intval($category_id) >0)?intval($category_id):0;
+		} else {
+			$category_id = 0;
 		}
 
 		// cron on?
-		$cron_flag = false;
 		if (isset($_GET['cron']) AND !empty($_GET['cron']))
 		{
 			$cron_flag = true;
 			$limit = 0; // execute cron with no limit.
 			//that become $limit = $default_limit;  execute cron with default limit.
+		} else {
+			$cron_flag = false;
 		}
 
 		if ($limit == 0 && $cron_flag == false) { // normal request without limit
