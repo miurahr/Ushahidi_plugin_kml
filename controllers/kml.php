@@ -31,17 +31,8 @@ class Kml_Controller extends Controller
 		// 4.2. no cache -> get data from sql, and write in view
 		Kohana::config_load('kml');
 
-		// 0.
-		// max file size :     3MB
-		// max raw KML size : 10MB
-		// max network link : 10
-		// max items        : 1000 <-- apply
-		// max items in view: 80
-		$default_limit = 1000;
-
-		// for sinsai.info real data
-		// 1000items  6.8MB in raw KML, 0.5MB in KMZ
-		// 1500items  9.8MB in raw KML, 1.3MB in KMZ
+		$default_limit = Kohana::config('kml.default_limit');
+		$default_limit = isset($default_limit)?$default_limit:1000;
 
 		// 1.
 		if (isset($_GET['l']) AND !empty($_GET['l']))
