@@ -11,6 +11,7 @@
  * that is available through the world-wide-web at the following URI:
  * http://www.gnu.org/copyleft/lesser.html
  * @author	   Ushahidi Team <team@ushahidi.com> 
+ * @author     Hiroshi Miura <miurahr@osmf.jp>
  * @package    Ushahidi - http://source.ushahididev.com
  * @module	   Feed Controller	
  * @copyright  Ushahidi - http://www.ushahidi.com
@@ -53,7 +54,7 @@ class Kml_Controller extends Controller
 
 		if (isset($_GET['cat']) AND !empty($_GET['cat'])) {
 			$category_id = $this->input->xss_clean($_GET['cat']);
-			$category_id = (isset($category_id) AND intval($category_id) >0)?intval($category_id):0;
+			$category_id = (isset($category_id) AND intval($category_id) > 0)?								intval($category_id):0;
 		} else {
 			$category_id = 0;
 		}
@@ -62,13 +63,12 @@ class Kml_Controller extends Controller
 		if (isset($_GET['cron']) AND !empty($_GET['cron']))
 		{
 			$cron_flag = true;
-			$limit = 0; // execute cron with no limit.
-			//that become $limit = $default_limit;  execute cron with default limit.
+			$limit = 0; // execute cron with default limit.
 		} else {
 			$cron_flag = false;
 		}
 
-		// use cdn when normal request without limit and category
+		// use cdn when normal request
 		if ($limit == 0 && $cron_flag == false && $category_id == 0) { 
 			url::redirect(Kohana::config("kml.cdn_kml_url"));
 		}
@@ -103,10 +103,9 @@ class Kml_Controller extends Controller
 		}
 		elseif ($limit == 0 && $category_id == 0 && $cron_flag == true)
 		{ 
-			// cron default request should do with $default names and $default_limit.
+			// cron request should do with $default names 
+			// and $default_limit.
 			$limit = $default_limit;
-			$kml_filename = $kml_filename;
-			$kmz_filename = $kmz_filename;
 		}
 		else
 		{
@@ -115,64 +114,50 @@ class Kml_Controller extends Controller
 			$kmz_filename = $cat_name.$kml_filename;
 		}
 
-		$kmlFileName = Kohana::config('upload.directory', TRUE) . $kml_filename;  // internal path to KML file in uploads directory
-		$kmzFileName = Kohana::config('upload.directory', TRUE)  . $kmz_filename;  // internal path to KMZ file in uploads directory
+  		// internal path to KML/KMZ file in uploads directory
+		$kmlFileName = Kohana::config('upload.directory', TRUE) . $kml_filename;
+		$kmzFileName = Kohana::config('upload.directory', TRUE) . $kmz_filename;
 
 		// 3.
-
 		//=== Caching Options ==
-		$cache_secs = 120; 	// seconds during which to serve cached file, after which re-generate on next request
-		$cache_on = true; 	// true = cache file, false = debug mode: file is re-generated on each request
-
-		$use_cache = false;
-
-		if (file_exists($kmzFileName) && (time() - filemtime($kmzFileName) < $cache_secs) && $cache_on) {
+		$cache_secs = 120; 	// seconds during which to serve cached file, 
+							// after which re-generate on next request
+		$cache_on = true; 	// true  = use cache file 
+							// false = debug mode: re-generated on each req.
+		if ($cache_on && file_exists($kmzFileName)
+			&& (time() - filemtime($kmzFileName) < $cache_secs)) {
 			$use_cache = true;
-		}
-		
-		// 4.
-		if ($use_cache)
-		{
 			// 4.1
 			$incidents = NULL;
 			$categories = NULL;
-			
 		}
 		else
 		{
+			$use_cache = false;
 			// 4.2
-			if ($limit != 0) 
+			$incidents = ORM::factory('incident')
+					->orderby('incident_date', 'desc');
+			if ($category_id == 0)
 			{
-				// If so, Get all incidents upto limit
-				$incidents = ORM::factory('incident')
-					->where('incident_active', '1')
-					->orderby('incident_date', 'desc')
-					->limit($limit)
-					->find_all();
+					$incidents = $incidents->where('incident_active', '1');
 			}
-			else
+			else 
 			{
-				// Otherwise, Get all incidents (no limit)
-				$incidents = ORM::factory('incident')
-					->where('incident_active', '1')
-					->orderby('incident_date', 'desc')
-					->find_all();
+					$incidents = $incidents->join('incident_category', 
+						 		'incident_category.incident_id','incident.id',
+						   		'INNER')
+							->where(array('incident_category.category_id'
+						        => strval($category_id),
+						      'incident_active' => '1'));
 			}
-			// Get all Categories...
-			$categories = array();
-			if ($category_id == 0) {
-				$categories = ORM::factory('category')
-					->where('category_visible', '1')
-					->find_all();
-			} else {
-				$categories = ORM::factory('category')
-					->where('id', $category_id)
-					->where('category_visible', '1')
-					->find_all();
-			}
-
+			$incident_items = ($limit != 0) ?$incidents->find_all($limit,0)
+											:$incidents->find_all();
 		}
-		
+		// Get all Categories...
+		$categories = ORM::factory('category')
+						->where('category_visible', '1')
+						->find_all();
+
 		//header("Content-Type: application/vnd.google-earth.kml+xml");
 		header("Content-Type: application/vnd.google-earth.kmz");
 		//header("Content-Disposition: attachment; filename=".time().".kml");
@@ -181,22 +166,20 @@ class Kml_Controller extends Controller
 		header("Last-Modified: ".gmdate("D, d M Y H:i:s")." GMT");
 		header("Cache-Control: cache, must-revalidate");
 		header("Pragma: public");
+
 		$view = new View("kml");
 		$view->kml_name = htmlspecialchars(Kohana::config('settings.site_name'));
 		$view->kml_tagline = htmlspecialchars(Kohana::config('settings.site_tagline'));
-		$view->items = $incidents;
-		$view->categories = $categories;
-
-		// move from view
 		$view->kml_filename = $kml_filename;
 		$view->kmz_filename = $kmz_filename;
 		$view->kmlFileName = $kmlFileName;
 		$view->kmzFileName = $kmzFileName;
-		
+
+		$view->items = $incident_items;
+		$view->categories = $categories;
 
 		// set use cache
 		$view->use_cache = $use_cache;
-
 		// set cron flag
 		$view->cron_flag = $cron_flag;
 
