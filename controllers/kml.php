@@ -29,8 +29,6 @@ class Kml_Controller extends Controller
 		// 3. ditect cache
 		// 4.1. has cache -> return file
 		// 4.2. no cache -> get data from sql, and write in view
-		Kohana::config_load('kml');
-
 		$default_limit = Kohana::config('kml.default_limit');
 		$default_limit = isset($default_limit)?$default_limit:1000;
 
@@ -111,15 +109,13 @@ class Kml_Controller extends Controller
 
 		// 3.
 		//=== Caching Options ==
-		$cache_secs = 120; 	// seconds during which to serve cached file, 
-							// after which re-generate on next request
-		$cache_on = true; 	// true  = use cache file 
-							// false = debug mode: re-generated on each req.
+		$cache_secs = Kohana::config('kml.cache_secs',TRUE);
+		$cache_on = Kohana::config('kml.cache_on',TRUE);
 		if ($cache_on && file_exists($kmzFileName)
 			&& (time() - filemtime($kmzFileName) < $cache_secs)) {
 			$use_cache = true;
 			// 4.1
-			$incidents = NULL;
+			$incident_items = NULL;
 			$categories = NULL;
 		}
 		else

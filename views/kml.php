@@ -6,48 +6,16 @@
 //=== Option Variables ==
 //--- File Options --
 $urlbase = Kohana::config("kml.kmlsite");
-$upload_directory = $urlbase . "media/uploads/";  // external URL for Ushahidi uploads directory
 
-// move to controller
-//$kml_filename = "latest.kml";  // filename for exported KML file
-//$kmz_filename = "latest.kmz";  // filename for exported KMZ file
-//$kmlFileName = Kohana::config('upload.directory', TRUE) . $kml_filename;  // internal path to KML file in uploads directory
-//$kmzFileName = Kohana::config('upload.directory', TRUE)  . $kmz_filename;  // internal path to KMZ file in uploads directory
-//--- Balloon Options --
-$placemark_balloon_width = "340";  // width in pixels (suggest 200 to 500)
-$document_balloon_width = "340";  // width in pixels (suggest 200 to 500)
-$title_text_color = "black";  // HTML color (works in Google Earth, ignored in Google Maps)
-$verified_text_color = "green";  // HTML color (works in Google Earth & Maps)
-$description_text_color = "black";  // HTML color (works in Google Earth & Maps)
-$location_text_color = "gray";		// HTML color (works in Google Eatth & Maps)
-$categories_text_color = "gray";  // HTML color (works in Google Earth & Maps)
-$date_text_color = "gray";  // HTML color (works in Google Earth & Maps)
-$verified_in_balloons = true; 	// True/False, true = show verified status in balloons, false = don't show
-$media_in_balloons = true;	// True/False, true = show media links (if available) in balloons, false = don't show
-$location_in_balloons = true;	// True/False, true = show location in balloons, false = don't show
-$cats_in_balloons = "icons";	// tree/icons/none,  tree = show categories tree listing in balloons, icons = only show category icons, none = don't show icons
-$cat_parents = false;	// if showing cats_in_balloons, include parent categories in the tree or icon list
-$cat_icon_size = 16;	// size in pixels of category icons in balloons
-//--- Structure Options --
-$folder_snippets = 0;  //  1/0, 1 = show category description as snippet (if description different from title), 0 = no snippet.
-$visibility = 1;  //  1/0, 1 = placemarks & folders visible on initial load, 0 = not visible
-$extended_data = true;		// True/False, true = write extended data section in each placemark kml, false = No extended data
-$bundle_icons = true;	// True/False, true = bundle icon images into KMZ, false = link to images on server
-$bundle_media_tumbs = false;	// True/False, true = bundle media thumbnail images into KMZ, false = link to images on server
 //--- load options array --
-$options = array("upload_directory"=>$upload_directory, "kml_filename"=>$kml_filename, "kmz_filename"=>$kmz_filename, "kmlFileName"=>$kmlFileName, "kmzFileName"=>$kmzFileName, "placemark_balloon_width"=>$placemark_balloon_width, "document_balloon_width"=>$document_balloon_width, "title_text_color"=>$title_text_color, "verified_text_color"=>$verified_text_color, "description_text_color"=>$description_text_color, "location_text_color"=>$location_text_color, "categories_text_color"=>$categories_text_color, "date_text_color"=>$date_text_color, "verified_in_balloons"=>$verified_in_balloons, "media_in_balloons"=>$media_in_balloons, "location_in_balloons"=>$location_in_balloons, "cats_in_balloons"=>$cats_in_balloons, "cat_parents"=>$cat_parents, "cat_icon_size"=>$cat_icon_size, "folder_snippets"=>$folder_snippets, "visibility"=>$visibility, "extended_data"=>$extended_data, "bundle_icons"=>$bundle_icons, "bundle_media_tumbs"=>$bundle_media_tumbs);
+$options = Kohana::config("kml.options");
+$options["kml_filename"]=$kml_filename;
+$options["kmz_filename"]=$kmz_filename;
+$options["kmlFileName"]=$kmlFileName;
+$options["kmzFileName"]=$kmzFileName;
 
-//=== Caching Options ==
-//$cache_secs = 120; 	// seconds during which to serve cached file, after which re-generate on next request
-//$cache_on = true; 	// true = cache file, false = debug mode: file is re-generated on each request
-
-//=== Logo Details == (image file for in balloons: png/jpg/gif; suggested size: 36 x 36 pixels)
-$logo_path = $urlbase . "plugins/kml/views/";
-$logo_filename = "sinsai_logo_36x36.png";
-$logo_width = 36;
-$logo_height = 36;
-//--- load logo array --
-$logo =  array("path"=>$logo_path, "filename"=>$logo_filename, "width"=>$logo_width, "height"=>$logo_height);
+//=== Logo Details == 
+$logo = Kohana::config("kml.logo");
 
 //=== Shared Data Variables and Arrays ==
 $kml_styles = ""; 	// KML styles string for all categories
@@ -93,7 +61,7 @@ function write_kml_head($kmlFile, $kml_name, $kml_tagline, $options) {
 	"			<ListStyle>" . PHP_EOL .
 	"				<ItemIcon>" . PHP_EOL .
 	"					<href>" . htmlspecialchars($urlbase . "plugins/kml/views/sinsai_logo_36x36.png") . "</href>" . PHP_EOL .
-	"				</ItemIcon>" . PHP_EOL .
+    "				</ItemIcon>" . PHP_EOL .
 	"				<maxSnippetLines>1</maxSnippetLines>" . PHP_EOL .
 	"			</ListStyle>" . PHP_EOL .
 	"			<BalloonStyle>" . PHP_EOL .
