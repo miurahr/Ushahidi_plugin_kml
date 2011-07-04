@@ -52,27 +52,8 @@ class Kml_Controller extends Controller
 		return array($limit, $category_id, $cron_flag);
 	}
 
-	public function index()
+	private function set_filename($limit, $category_id, $cron_flag)
 	{
-		// 0. define default limitation for google maps
-		// 1. get limit
-		// 2. set filename
-		// 3. ditect cache
-		// 4.1. has cache -> return file
-		// 4.2. no cache -> get data from sql, and write in view
-
-		$default_limit = Kohana::config('kml.default_limit');
-		$default_limit = isset($default_limit)?$default_limit:1000;
-
-		// 1.
-		list($limit, $category_id, $cron_flag) = $this::get_params();
-
-		// use cdn when normal request
-		if ($limit == -1 && $cron_flag == false && $category_id == 0) { 
-			url::redirect(Kohana::config("kml.cdn_kml_url"));
-		}
-
-		// 2.
 		$kml_filename = "latest.kml";  // filename for exported KML file
 		$kmz_filename = "latest.kmz";  // filename for exported KMZ file
 
@@ -93,7 +74,6 @@ class Kml_Controller extends Controller
 		{ 
 			// cron request without parameter 
 			// generate default kml file that is distributed through CDN
-			$limit = $default_limit;
 		}
 		elseif ($limit == 0)
 		{
@@ -102,7 +82,6 @@ class Kml_Controller extends Controller
 		}
 		elseif ($limit == -1) 
 		{
-			$limit = $default_limit;
 			$kml_filename = $cat_name.$kml_filename;
 			$kmz_filename = $cat_name.$kmz_filename;
 		}
@@ -110,6 +89,35 @@ class Kml_Controller extends Controller
 		{
 			$kml_filename = $cat_name.strval($limit)."_".$kml_filename;
 			$kmz_filename = $cat_name.strval($limit)."_".$kmz_filename;
+		}
+		return array($kml_filename, $kmz_filename);
+	}
+
+	public function index()
+	{
+		// 0. define default limitation for google maps
+		// 1. get limit
+		// 2. set filename
+		// 3. ditect cache
+		// 4.1. has cache -> return file
+		// 4.2. no cache -> get data from sql, and write in view
+
+		// 1.
+		list($limit, $category_id, $cron_flag) = $this::get_params();
+
+		// use cdn when normal request
+		if ($limit == -1 && $cron_flag == false && $category_id == 0) { 
+			url::redirect(Kohana::config("kml.cdn_kml_url"));
+		}
+
+		// 2.
+		list($kml_filename, $kmz_filename) = 
+					$this::set_filename($limit, $category_id, $cron_flag);
+
+		if ($limit == -1)
+		{
+			$default_limit = Kohana::config('kml.default_limit');
+			$limit = isset($default_limit)?$default_limit:1000;
 		}
 
   		// internal path to KML/KMZ file in uploads directory
