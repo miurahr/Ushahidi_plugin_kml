@@ -23,12 +23,15 @@ class Kml_Controller extends Controller
 {
 	private function get_params()
 	{
+		// ?l=<n> means limit number of items <= n
+		// ?l=0 means don't limit
+		// without limit, default limit will be applied.
 		if (isset($_GET['l']) AND !empty($_GET['l']))
 		{
 			$limit = $this->input->xss_clean($_GET['l']);
 			$limit = (isset($limit) AND intval($limit) >0)?intval($limit):0;
 		} else {
-			$limit = 0;
+			$limit = -1;
 		}
 
 		if (isset($_GET['cat']) AND !empty($_GET['cat'])) {
@@ -57,13 +60,15 @@ class Kml_Controller extends Controller
 		// 3. ditect cache
 		// 4.1. has cache -> return file
 		// 4.2. no cache -> get data from sql, and write in view
+
 		$default_limit = Kohana::config('kml.default_limit');
 		$default_limit = isset($default_limit)?$default_limit:1000;
 
 		// 1.
 		list($limit, $category_id, $cron_flag) = $this::get_params();
+
 		// use cdn when normal request
-		if ($limit == 0 && $cron_flag == false && $category_id == 0) { 
+		if ($limit == -1 && $cron_flag == false && $category_id == 0) { 
 			url::redirect(Kohana::config("kml.cdn_kml_url"));
 		}
 
@@ -84,28 +89,27 @@ class Kml_Controller extends Controller
 			$cat_name = "";
 		}
 
-		if ($limit == -1)
+		if ($limit == -1 && $category_id == 0 && $cron_flag == true)
+		{ 
+			// cron request without parameter 
+			// generate default kml file that is distributed through CDN
+			$limit = $default_limit;
+		}
+		elseif ($limit == 0)
 		{
 			$kml_filename = $cat_name."full_".$kml_filename;
 			$kmz_filename = $cat_name."full_".$kmz_filename;
-			$limit = 0; // change to 0 that originaly mean  no limit.
 		}
-		elseif ($limit != 0) 
-		{
-			$kml_filename = $cat_name.strval($limit)."_".$kml_filename;
-			$kmz_filename = $cat_name.strval($limit)."_".$kmz_filename;
-		}
-		elseif ($limit == 0 && $category_id == 0 && $cron_flag == true)
-		{ 
-			// cron request should do with $default names 
-			// and $default_limit.
-			$limit = $default_limit;
-		}
-		else
+		elseif ($limit == -1) 
 		{
 			$limit = $default_limit;
 			$kml_filename = $cat_name.$kml_filename;
 			$kmz_filename = $cat_name.$kml_filename;
+		}
+		else
+		{
+			$kml_filename = $cat_name.strval($limit)."_".$kml_filename;
+			$kmz_filename = $cat_name.strval($limit)."_".$kmz_filename;
 		}
 
   		// internal path to KML/KMZ file in uploads directory
