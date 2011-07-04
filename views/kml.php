@@ -88,14 +88,14 @@ function generate_style($category, $catID_icons, $options) {
 	"		</StyleMap>" . PHP_EOL .
 	"		<Style id='style_categoryID_" . $category->id . "_n'>" . PHP_EOL .
 	"			<IconStyle>" . PHP_EOL .
-	"				<scale>0.6</scale>" . PHP_EOL .
+	"				<scale>" . $options['normal_icon_scale'] . "</scale>" . PHP_EOL .
 	"				<Icon>" . PHP_EOL .
 	"					<href>" . $catID_icons[$category->id]["placemark"] . "</href>" . PHP_EOL .
 	"				</Icon>" . PHP_EOL .
 	"				<hotSpot x='0.5' y='0.5' xunits='fraction' yunits='fraction' />" . PHP_EOL .
 	"			</IconStyle>" . PHP_EOL .
 	"			<LabelStyle>" . PHP_EOL .
-	"				<scale>0.8</scale>" . PHP_EOL .
+	"				<scale>" . $options['normal_label_scale'] . "</scale>" . PHP_EOL .
 	"			</LabelStyle>" . PHP_EOL .
 	"			<BalloonStyle>" . PHP_EOL .
 	"				<text><![CDATA[<html><body><h2 style='color:" . $options["title_text_color"] . "; '>$[name]</h2>$[description]</body></html>]]></text>" . PHP_EOL .
@@ -103,14 +103,14 @@ function generate_style($category, $catID_icons, $options) {
 	"		</Style>" . PHP_EOL .
 	"		<Style id='style_categoryID_" . $category->id . "_h'>" . PHP_EOL .
 	"			<IconStyle>" . PHP_EOL .
-	"				<scale>0.8</scale>" . PHP_EOL .		
+	"				<scale>" . $options['highlight_icon_scale'] . "</scale>" . PHP_EOL .		
 	"				<Icon>" . PHP_EOL .
 	"					<href>" . $catID_icons[$category->id]["placemark"] . "</href>" . PHP_EOL .
 	"				</Icon>" . PHP_EOL .
 	"				<hotSpot x='0.5' y='0.5' xunits='fraction' yunits='fraction' />" . PHP_EOL .
 	"			</IconStyle>" . PHP_EOL .
 	"			<LabelStyle>" . PHP_EOL .
-	"				<scale>0.9</scale>" . PHP_EOL .
+	"				<scale>" . $options['highlight_label_scale'] . "</scale>" . PHP_EOL .
 	"			</LabelStyle>" . PHP_EOL .
 	"			<BalloonStyle>" . PHP_EOL .
 	"				<text><![CDATA[<html><body><h2 style='color:" . $options["title_text_color"] . "; '>$[name]</h2>$[description]</body></html>]]></text>" . PHP_EOL .

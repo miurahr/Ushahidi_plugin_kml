@@ -43,6 +43,10 @@ $config['options'] = array(
 	'extended_data' => true,      // True/False, true = write extended data section in each placemark kml, false = No extended data
 	'bundle_icons' => true,   // True/False, true = bundle icon images into KMZ, false = link to images on server
 	'bundle_media_tumbs' => false,    // True/False, true = bundle media thumbnail images into KMZ, false = link to images on server
+	'normal_label_scale' => 0.8,
+	'highlight_label_scale' => 0.9,
+	'normal_icon_scale' => 0.6,
+	'highlight_icon_scale' => 0.8,
 );
 
 //=== Logo Details == (image file for in balloons: png/jpg/gif; suggested size: 36 x 36 pixels)
