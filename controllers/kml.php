@@ -21,18 +21,8 @@
 
 class Kml_Controller extends Controller
 {
-	public function index()
+	private function get_params()
 	{
-		// 0. define default limitation for google maps
-		// 1. get limit
-		// 2. set filename
-		// 3. ditect cache
-		// 4.1. has cache -> return file
-		// 4.2. no cache -> get data from sql, and write in view
-		$default_limit = Kohana::config('kml.default_limit');
-		$default_limit = isset($default_limit)?$default_limit:1000;
-
-		// 1.
 		if (isset($_GET['l']) AND !empty($_GET['l']))
 		{
 			$limit = $this->input->xss_clean($_GET['l']);
@@ -43,7 +33,8 @@ class Kml_Controller extends Controller
 
 		if (isset($_GET['cat']) AND !empty($_GET['cat'])) {
 			$category_id = $this->input->xss_clean($_GET['cat']);
-			$category_id = (isset($category_id) AND intval($category_id) > 0)?								intval($category_id):0;
+			$category_id = (isset($category_id) AND intval($category_id) > 0)?
+							intval($category_id):0;
 		} else {
 			$category_id = 0;
 		}
@@ -56,7 +47,22 @@ class Kml_Controller extends Controller
 		} else {
 			$cron_flag = false;
 		}
+		return array($limit, $category_id, $cron_flag);
+	}
 
+	public function index()
+	{
+		// 0. define default limitation for google maps
+		// 1. get limit
+		// 2. set filename
+		// 3. ditect cache
+		// 4.1. has cache -> return file
+		// 4.2. no cache -> get data from sql, and write in view
+		$default_limit = Kohana::config('kml.default_limit');
+		$default_limit = isset($default_limit)?$default_limit:1000;
+
+		// 1.
+		list($limit, $category_id, $cron_flag) = $this::get_params();
 		// use cdn when normal request
 		if ($limit == 0 && $cron_flag == false && $category_id == 0) { 
 			url::redirect(Kohana::config("kml.cdn_kml_url"));
