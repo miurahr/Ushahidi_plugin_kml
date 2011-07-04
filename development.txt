@@ -1,0 +1,44 @@
+//=== TODO ===================
+// "Submitted" may not be the correct title... should it be "Incident Date/Time" or similar?  Other date/times to consider?
+// KMZ File Bunding
+//    add code to bundle icons in KMZ if option is set
+//    add option & code to bundle media image thumbnials into KMZ
+// Category Strings
+//    Detect category length, if short, show as PARENT >> SUBCAT (one line)
+//    refactor code to only show category icons (not titles) in balloons
+//    add category links to category icons (& text?) in balloons (done for "icons" type of cat string)
+// Folders
+//    for Empty Cat/Subcat Folders, indicate they are empty (with text added to name, or indicator placemark)
+//    add option & code to put placemarks in parent folder (with other subcat folders) into another folder ("Other", etc.?)
+
+
+
+//=== TODO, maybe, later...
+// only write new if new incidents added
+// Check GMaps functionality
+// Check on category image transparency??
+// Update KML/KMZ using Scheduler??
+// Generate Legend?  
+// Internationalization?
+// Auto limits on items retrieved/shown?
+// Option for radio buttons?
+// Option selection page or file?
+// Add to API
+// Make x.kml and x.kmz and x_nl.kml available as files
+// GeoSiteMap!
+// Check reliability and future plans for Swatch generator
+// Is there a mobile web version of Ushahidi that could feed pages into balloons (iframe)? (Maps compatible?)
+// Think about other ways to notify user of update data/staleness ... screen overlay date?  Other options? How important?
+// Think about best way to add Network Link functionality for automatic updates
+// If providing network link, what's the best way to provide download of static version: in top level doc balloon?  In a folder title (make it a link)?
+
+
+//=== DONE ===
+// add option & code to only show category icons (not titles) in balloons
+// change some more options from 1/0 to true/false (where applicable)
+// remove space before image thumbnail
+// Add "updated" timestamp to top level folder snippett
+// for media links, get domain of link as hyperlink text
+// for media links, detect when link is empty, and don't write it.
+// NOT FEASIBLE (would change balloon title too): add option & code to limit length of placemark labels (limit # of characters, cut off on word boundary)
+
