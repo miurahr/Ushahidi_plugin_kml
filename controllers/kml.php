@@ -104,7 +104,7 @@ class Kml_Controller extends Controller
 		{
 			$limit = $default_limit;
 			$kml_filename = $cat_name.$kml_filename;
-			$kmz_filename = $cat_name.$kml_filename;
+			$kmz_filename = $cat_name.$kmz_filename;
 		}
 		else
 		{
