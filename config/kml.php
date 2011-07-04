@@ -47,6 +47,7 @@ $config['options'] = array(
 	'highlight_label_scale' => 0.9,
 	'normal_icon_scale' => 0.6,
 	'highlight_icon_scale' => 0.8,
+	'compress' => true,
 );
 
 //=== Logo Details == (image file for in balloons: png/jpg/gif; suggested size: 36 x 36 pixels)

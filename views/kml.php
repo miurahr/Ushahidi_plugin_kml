@@ -635,7 +635,10 @@ else {
 		fclose($kmlFile);
 		kohana::log('info', " ...locked and closed $kmlFileName");
 
-		$kmz = create_kmz($kmlFileName, $kmzFileName);
+		if ($options['compress'])
+		{
+			$kmz = create_kmz($kmlFileName, $kmzFileName);
+		}
 	} else {
 		kohana::log('error', "Couldn't lock $kmlFileName");
 	}
@@ -643,10 +646,16 @@ else {
 
 
 //=== Read file out to user ==
-//readfile($kmlFileName);
 if ( ! $cron_flag )
 {
-	readfile($kmzFileName);
+	if ($options['compress'])
+	{
+		readfile($kmzFileName);
+	}
+	else
+	{
+		readfile($kmlFileName);
+	}
 }
 
 ?>
