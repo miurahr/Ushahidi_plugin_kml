@@ -43,7 +43,6 @@ class Kml_Controller extends Controller
 		if (isset($_GET['cron']) AND !empty($_GET['cron']))
 		{
 			$cron_flag = true;
-			$limit = 0; // execute cron with default limit.
 		} else {
 			$cron_flag = false;
 		}
