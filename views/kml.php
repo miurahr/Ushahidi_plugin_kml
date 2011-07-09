@@ -10,9 +10,6 @@ $options["kmz_filename"]=$kmz_filename;
 $options["kmlFileName"]=$kmlFileName;
 $options["kmzFileName"]=$kmzFileName;
 
-//=== Logo Details == 
-$logo = Kohana::config("kml.logo");
-
 //=== Shared Data Variables and Arrays ==
 $kml_styles = ""; 	// KML styles string for all categories
 $catID_data = array();  // contains all categories, indexed by their category id
@@ -29,6 +26,7 @@ $catID_to_incidents = array();  // array with all category IDs, each with array 
 //=== function to write KML header ==
 function write_kml_head($kmlFile, $kml_name, $kml_tagline, $options) {
 	$urlbase = kml::get_kmlsite();
+	$logo = Kohana::config("kml.logo");
 	$kml_head =	"" . 
 	"<?xml version='1.0' encoding='UTF-8'?>" . PHP_EOL .
 	"<kml xmlns='http://www.opengis.net/kml/2.2' xmlns:gx='http://www.google.com/kml/ext/2.2' xmlns:kml='http://www.opengis.net/kml/2.2' xmlns:atom='http://www.w3.org/2005/Atom'>" . PHP_EOL .
@@ -45,7 +43,7 @@ function write_kml_head($kmlFile, $kml_name, $kml_tagline, $options) {
 	//"			<p>Static KML file for offline use: <a href='" . $options["upload_directory"] . $options["kmz_filename"] . "'>" . $options["kmz_filename"] . "</a></p>" . PHP_EOL .
 	"			<hr />" . PHP_EOL .
 	"			<table width='100%' cellpadding='0' cellspacing='0'><tr><td align='left'>" . PHP_EOL .
-	"				<img src='" . $urlbase . "plugins/kml/views/sinsai_logo_36x36.png' width='36' height='36' />" . PHP_EOL .
+	"				<img src='" . $logo["path"]. $logo["filename"]."' width='".$logo["width"]."' height='".$logo["height"]."' />" . PHP_EOL .
 	"			</td><td align='right'>" . PHP_EOL .
 	"				<a href='" . $urlbase . "'><strong>" . $urlbase . "</strong></a><br />" . PHP_EOL .
 	"				<a href='" . $urlbase . "reports/submit/'>Submit a new report</a>" . PHP_EOL .
@@ -56,7 +54,7 @@ function write_kml_head($kmlFile, $kml_name, $kml_tagline, $options) {
 	"		<Style id='style_top_document'>" . PHP_EOL .
 	"			<ListStyle>" . PHP_EOL .
 	"				<ItemIcon>" . PHP_EOL .
-	"					<href>" . htmlspecialchars($urlbase . "plugins/kml/views/sinsai_logo_36x36.png") . "</href>" . PHP_EOL .
+	"					<href>" . htmlspecialchars($logo["path"]. $logo["filename"]) . "</href>" . PHP_EOL .
     "				</ItemIcon>" . PHP_EOL .
 	"				<maxSnippetLines>1</maxSnippetLines>" . PHP_EOL .
 	"			</ListStyle>" . PHP_EOL .
@@ -131,16 +129,7 @@ function generate_folder_style($category, $catID_icons, $options) {
 
 //=== function to write Folder header for one category ==
 function write_folder_head($kmlFile, $category, $options) {
-	// check if category description is same as category title, or is blank
-	if ($category->category_title == $category->category_description || $category->category_description == "") {
-		// if so, make snippet blank
-		$category_snippet = "<snippet maxLines='0'></snippet>";
-	}
-	else {
-		// if not, make snippet contain category description
-		$category_snippet = "<snippet maxLines='1'>" . $category->category_description . "</snippet>";
-	}
-
+	$category_snippet = kml::get_category_folder_head_snippet($category);
 	$kml_folder_head = "" . 
 	"		<Folder id='folder_categoryID_" . $category->id . "'>" . PHP_EOL .
 	"			<name><![CDATA[" . $category->category_title . "]]></name>" . PHP_EOL .
@@ -153,9 +142,9 @@ function write_folder_head($kmlFile, $category, $options) {
 }
 
 //=== function to write placemark for one item ==
-//function write_placemark($kmlFile, $item, $cat_id, $categories_string, $logo, $options) {
-function write_placemark($kmlFile, $item, $cat_id, $catID_data, $catID_icons, $logo, $options) {
+function write_placemark($kmlFile, $item, $cat_id, $catID_data, $catID_icons, $options) {
 	$urlbase = kml::get_kmlsite();
+	$logo = Kohana::config("kml.logo");
 
 	// Populate verified string (if option is set and item is verified)
 	$verified_string = "";
@@ -526,7 +515,7 @@ function process_categories($kmlFile, $categories, &$catID_icons, &$kml_styles, 
 
 
 //=== Function with folder and placemark generation logic
-function write_kml_data($kmlFile, $items, $catID_to_incidents, $cat_to_subcats, $catID_data, $catID_icons, $logo, $options) {
+function write_kml_data($kmlFile, $items, $catID_to_incidents, $cat_to_subcats, $catID_data, $catID_icons, $options) {
 
 	//=== Iterate through incidents (build arrays of incidents in each category)
 	foreach($items as $incident) {
@@ -561,7 +550,7 @@ function write_kml_data($kmlFile, $items, $catID_to_incidents, $cat_to_subcats, 
 				// then iterate through incidents (if any) attached to that cat ID
 				foreach ($catID_to_incidents[$subcat->id] as $item) {
 					// write incident/item's placemark
-					write_placemark($kmlFile, $item, $subcat->id, $catID_data, $catID_icons, $logo, $options);
+					write_placemark($kmlFile, $item, $subcat->id, $catID_data, $catID_icons, $options);
 				} 
 			}
 			// Write folder footer for the sub category
@@ -572,7 +561,7 @@ function write_kml_data($kmlFile, $items, $catID_to_incidents, $cat_to_subcats, 
 			// then iterate through incidents attached to that cat ID
 			foreach($catID_to_incidents[$cat_id] as $item) {
 				// write incident/item's placemark
-				write_placemark($kmlFile, $item, $cat_id, $catID_data, $catID_icons, $logo, $options);
+				write_placemark($kmlFile, $item, $cat_id, $catID_data, $catID_icons, $options);
 			} 
 		}
 		// Write folder footer for top-level category
@@ -608,7 +597,7 @@ else {
 		
 		fwrite($kmlFile, $kml_styles);
 		
-		write_kml_data($kmlFile, $items, $catID_to_incidents, $cat_to_subcats, $catID_data, $catID_icons, $logo, $options);
+		write_kml_data($kmlFile, $items, $catID_to_incidents, $cat_to_subcats, $catID_data, $catID_icons, $options);
 		
 		write_kml_foot($kmlFile);
 		

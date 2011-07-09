@@ -45,5 +45,17 @@ class kml_Core {
 		return $domain;
 	}
 
+	function get_category_folder_head_snippet($category) {
+		// check if category description is same as category title, or is blank
+		if ($category->category_title == $category->category_description || $category->category_description == "") {
+			// if so, make snippet blank
+			$category_snippet = "<snippet maxLines='0'></snippet>";
+		}
+		else {
+			// if not, make snippet contain category description
+			$category_snippet = "<snippet maxLines='1'>" . $category->category_description . "</snippet>";
+		}
+		return $category_snippet;
+	}
 
 }
