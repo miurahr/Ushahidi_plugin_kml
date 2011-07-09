@@ -1,6 +1,8 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 // Basic configuration
-$config['kmlsite'] = "http://www.sinsai.info/ushahidi/";
+$config['kmlsite'] = null;// if you want to prepare server for kml which has 
+						// differnt url, set it here.
+// ex. $config['kmlsite'] = "http://www.yoursite.com/ushahidi/"; 
 $config['default_limit'] = 1000;
 // for google maps
 	// max file size :     3MB

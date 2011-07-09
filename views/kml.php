@@ -4,8 +4,19 @@
 //  This code relies on operation of your Ushahidi instance's SWATCH image generator (http://<siteurl>/swatch/?...).  
 
 //=== Option Variables ==
-//--- File Options --
-$urlbase = Kohana::config("kml.kmlsite");
+function get_kmlsite()
+{
+if (Kohana::config("kml.kmlsite") != null AND 
+	strlen(Kohana::config("kml.kmlsite")) > 7 )
+{
+	$urlbase = Kohana::config("kml.kmlsite");
+}
+else
+{
+	$urlbase = url::base();
+}
+return $urlbase;
+}
 
 //--- load options array --
 $options = Kohana::config("kml.options");
@@ -32,7 +43,7 @@ $catID_to_incidents = array();  // array with all category IDs, each with array 
 
 //=== function to write KML header ==
 function write_kml_head($kmlFile, $kml_name, $kml_tagline, $options) {
-	$urlbase = Kohana::config("kml.kmlsite");
+	$urlbase = get_kmlsite();
 	$kml_head =	"" . 
 	"<?xml version='1.0' encoding='UTF-8'?>" . PHP_EOL .
 	"<kml xmlns='http://www.opengis.net/kml/2.2' xmlns:gx='http://www.google.com/kml/ext/2.2' xmlns:kml='http://www.opengis.net/kml/2.2' xmlns:atom='http://www.w3.org/2005/Atom'>" . PHP_EOL .
@@ -74,7 +85,7 @@ function write_kml_head($kmlFile, $kml_name, $kml_tagline, $options) {
 
 //=== function to generate StyleMap and Styles for one category's placemarks ==
 function generate_style($category, $catID_icons, $options) {
-	$urlbase = Kohana::config("kml.kmlsite");
+	$urlbase = get_kmlsite();
 	$kml_style = "" .
 	"		<StyleMap id='stylemap_categoryID_" . $category->id . "'>" . PHP_EOL .
 	"			<Pair>" . PHP_EOL .
@@ -159,7 +170,7 @@ function write_folder_head($kmlFile, $category, $options) {
 //=== function to write placemark for one item ==
 //function write_placemark($kmlFile, $item, $cat_id, $categories_string, $logo, $options) {
 function write_placemark($kmlFile, $item, $cat_id, $catID_data, $catID_icons, $logo, $options) {
-	$urlbase = Kohana::config("kml.kmlsite");
+	$urlbase = get_kmlsite();
 
 	// Populate verified string (if option is set and item is verified)
 	$verified_string = "";
@@ -234,7 +245,7 @@ function write_placemark($kmlFile, $item, $cat_id, $catID_data, $catID_icons, $l
 
 //=== function to generate Extended Data section (if enabled in options) ==
 function generate_extended_data($item, $cat_id, $categories_string, $options) {
-	$urlbase = Kohana::config("kml.kmlsite");
+	$urlbase = get_kmlsite();
 	$kml_extended_data = "";
 	if ($options["extended_data"]) {
 		$kml_extended_data = "" .
@@ -273,7 +284,7 @@ function write_kml_foot($kmlFile) {
 
 //=== function to generate media string for inclusion in placemark balloon ==
 function get_item_media($item) {
-	$urlbase = Kohana::config("kml.kmlsite");
+	$urlbase = get_kmlsite();
 	$item_media = array();
 	$item_media_string = "";
 	$close_table = false;
@@ -338,7 +349,7 @@ function get_domain($url) {
 
 //=== function to generate Categories String for inclusion in placemark balloon ==
 function generate_categories_string($item, $catID_data, $catID_icons, $options) {
-	$urlbase = Kohana::config("kml.kmlsite");
+	$urlbase = get_kmlsite();
 	$categories_string = "";
 	$cat_icon_size = $options["cat_icon_size"];
 
@@ -492,7 +503,7 @@ function create_kmz($kmlFileName, $kmzFileName){
 //=== Function to Process Categories ==
 //    ...(to build icons array, generate kml styles, and build data arrays for categories and subcat mapping)
 function process_categories($kmlFile, $categories, &$catID_icons, &$kml_styles, &$catID_data, &$cat_to_subcats, $options) {
-	$urlbase = Kohana::config("kml.kmlsite");
+	$urlbase = get_kmlsite();
 	// Iterate through categories...
 	foreach ($categories as $cat) {
 		// Write array of catIDs to icons
