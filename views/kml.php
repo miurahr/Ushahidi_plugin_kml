@@ -228,26 +228,6 @@ function write_kml_foot($kmlFile) {
 }
 
 
-//=== function to zip KML into KMZ file
-function create_kmz($kmlFileName, $kmzFileName){
-
-	kohana::log('info', "generating kmz file");
-	$zip = new ZipArchive();
-
-	if ($zip->open("$kmzFileName", ZIPARCHIVE::CREATE|ZIPARCHIVE::OVERWRITE)!==TRUE) {
-		kohana::log('error', "cannot open kmz file");
-		echo("cannot open <". $kmzFileName .">\n");
-	}
-
-	kohana::log('info', "adding kml to kmz file");
-	$zip->addFile($kmlFileName, "doc.kml");
-	//$zip->addFile("plugins/kml2/views/circle_border.png", "files/circle_border.png");
-	$zip->close();
-	kohana::log('info', "closed kmz file");
-	return $zip;
-}
-
-
 //=============================================================================================
 // Action Functions above, Logic Functions below
 //=============================================================================================
@@ -400,7 +380,7 @@ else {
 
 		if ($options['compress'])
 		{
-			$kmz = create_kmz($kmlFileName, $kmzFileName);
+			$kmz = kml::create_kmz($kmlFileName, $kmzFileName);
 		}
 	} else {
 		kohana::log('error', "Couldn't lock $kmlFileName");
