@@ -93,6 +93,25 @@ class Kml_Controller extends Controller
 		return array($kml_filename, $kmz_filename);
 	}
 
+	//=== function to zip KML into KMZ file
+	private function create_kmz($kmlFileName, $kmzFileName){
+
+		kohana::log('info', "generating kmz file");
+		$zip = new ZipArchive();
+
+		if ($zip->open("$kmzFileName", ZIPARCHIVE::CREATE|ZIPARCHIVE::OVERWRITE)!==TRUE) {
+			kohana::log('error', "cannot open kmz file");
+			echo("cannot open <". $kmzFileName .">\n");
+		}
+
+		kohana::log('info', "adding kml to kmz file");
+		$zip->addFile($kmlFileName, "doc.kml");
+		//$zip->addFile("plugins/kml2/views/circle_border.png", "files/circle_border.png");
+		$zip->close();
+		kohana::log('info', "closed kmz file");
+		return $zip;
+	}
+
 	public function index()
 	{
 		// 0. define default limitation for google maps
@@ -205,7 +224,7 @@ class Kml_Controller extends Controller
 		{
 		    if (Kohana::config('kml.compress'))
 			{
-				kml::create_kmz($kmlFileName, $kmzFileName);
+				$this::create_kmz($kmlFileName, $kmzFileName);
 				echo readfile($kmzFileName);
 			}
 			else

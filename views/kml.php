@@ -218,93 +218,19 @@ function kml_foot() {
 	return $kml_foot;
 }
 
-
-//=============================================================================================
-// Action Functions above, Logic Functions below
-//=============================================================================================
-//=== Function to Process Categories ==
-//    ...(to build icons array, generate kml styles, and build data arrays for categories and subcat mapping)
-function process_categories($categories, &$catID_icons, &$kml_styles, &$catID_data, &$cat_to_subcats, $options) {
-	$urlbase = url::base();
-	// Iterate through categories...
-	foreach ($categories as $cat) {
-		// Write array of catIDs to icons
-		$cat_icons = array();
-		// if category image is set, then construct icon URLs using image and add to relevant array
-		if(isset($cat->category_image)) {
-			// if so, use it for the icon
-			$cat_icons["placemark"] = htmlspecialchars($urlbase.Kohana::config("upload.relative_directory") . "/" .$cat->category_image);
-			$cat_icons["folder"] = htmlspecialchars($urlbase.Kohana::config("upload.relative_directory")."/".$cat->category_image);
-			$cat_icons["cat_string"] = htmlspecialchars($urlbase.Kohana::config("upload.relative_directory")."/".$cat->category_image_thumb);
-		}
-		// otherwise, construct icons using swatch generator
-		else {
-			// otherwise, use a color swatch
-			$cat_icons["placemark"] = htmlspecialchars($urlbase.'swatch/?t=cir&c='.$cat->category_color.'&b=000000&w=32&h=32');
-			$cat_icons["folder"] = htmlspecialchars($urlbase.'swatch/?t=rec&c='.$cat->category_color.'&b=000000&w=32&h=32');
-			$cat_icons["cat_string"] = htmlspecialchars($urlbase.'swatch/?t=rec&c='.$cat->category_color.'&b=000000&w=10&h=10');
-		}
-		$catID_icons[$cat->id] = $cat_icons;
-		
-		// Write KML styles for category's placemarks and folder
-		$kml_styles .= kml_style($cat, $catID_icons, $options);
-		
-		// Generate/Fill category data array (for easy cat data retrieval by cat id)
-		$catID_data[$cat->id] = $cat;
-		
-		//== Generate & Fill cat to subcat mapping array (index = top-level cat id, value array contains subcats)
-		// check if top-level category
-		if($cat->parent_id == 0) {
-			// if first time with this top-level category
-			if(!isset($cat_to_subcats[$cat->id])) {
-				// initialize mapping: write blank array for top-level category
-				$cat_to_subcats[$cat->id] = array();
-			}
-		}
-		// if not top-level category
-		else {
-			// if first time with this cat's parent category
-			if(!isset($cat_to_subcats[$cat->parent_id])) {
-				// initialize mapping: write blank array for subcategory
-				$cat_to_subcats[$cat->parent_id] = array();
-			}
-			// this is a sub-category, map it to its parent category
-			array_push($cat_to_subcats[$cat->parent_id], $cat);
-		}
-	}
-	return true;
-}
-
-
 //=============================================================================================
 // Generate and Write KML 
 //=============================================================================================
 
 	// we need to compress data after views generation.
 	// we write it file where controller demand once.
-	process_categories($categories, $catID_icons, $kml_styles, $catID_data, $cat_to_subcats, $options);
+	kml::process_categories($categories, $catID_icons, $kml_styles, $catID_data, $cat_to_subcats, $options);
 
 	fwrite($kmlFile, kml_head($kml_name, $kml_tagline, $options));
 	fwrite($kmlFile, $kml_styles);
 
-	//=== Iterate through incidents (build arrays of incidents in each category)
-	foreach($items as $incident) {
-		// for each category (and subcategory) that this incident belongs to (they are all in one array):
-		foreach($incident->category as $cat) {
-			// Check that it's a visible category
-			if ($cat->category_visible == '1') {
+	kml::process_incidents($items, $catID_to_incidents);	
 
-				// Check if it's the first time we've seen this category
-				if(!isset($catID_to_incidents[$cat->id])) {
-					// if so, initialize mapping: write blank array for category
-					$catID_to_incidents[$cat->id] = array();
-				}
-				// add incident to array of incidents for the category ID
-				array_push($catID_to_incidents[$cat->id], $incident);
-			}
-		} 
-	}
-	
 	//=== Iterate through top-level categories  (make array of subcategories)
 	foreach ($cat_to_subcats as $cat_id => $subcats) {
 
