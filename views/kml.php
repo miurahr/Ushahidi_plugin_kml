@@ -6,9 +6,9 @@
 //--- load options array --
 $options = Kohana::config("kml.options");
 $options["kml_filename"]=$kml_filename;
-$options["kmz_filename"]=$kmz_filename;
+//$options["kmz_filename"]=$kmz_filename;
 $options["kmlFileName"]=$kmlFileName;
-$options["kmzFileName"]=$kmzFileName;
+//$options["kmzFileName"]=$kmzFileName;
 
 //=== Shared Data Variables and Arrays ==
 $kml_styles = ""; 	// KML styles string for all categories
@@ -344,22 +344,10 @@ function write_kml_data($kmlFile, $items, $catID_to_incidents, $cat_to_subcats, 
 
 
 //=============================================================================================
-// Generate and Write KML and KMZ files to uploads directory
+// Generate and Write KML file to uploads directory
 //=============================================================================================
 
-
-// TOD: Add something to check if new incidents have come in and re-create files only if needed?
-
-// If file was modified in last X=$cache_time seconds (and debug mode off), don't bother re-generating
-//if (file_exists($kmzFileName) && (time() - filemtime($kmzFileName) < $cache_secs) && $cache_on) {
-//if (file_exists($kmzFileName) && (time() - filemtime($kmzFileName) < $cache_secs) && $debug_cache_off = false) {
-if ($use_cache)
-{
-	kohana::log('info', "returning cached kmz");
-}
-else {
-	// older, so generate a new one	
-	kohana::log('info', "generating new kml and kmz files");
+	kohana::log('info', "generating new kml file");
 	$kmlFile = fopen($kmlFileName, "w");
 	if (flock($kmlFile, LOCK_EX)) { // do an exclusive lock
 		kohana::log('info', "Got lock on $kmlFileName");
@@ -377,28 +365,8 @@ else {
 		flock($kmlFile, LOCK_UN); // release the lock
 		fclose($kmlFile);
 		kohana::log('info', " ...locked and closed $kmlFileName");
-
-		if ($options['compress'])
-		{
-			$kmz = kml::create_kmz($kmlFileName, $kmzFileName);
-		}
 	} else {
 		kohana::log('error', "Couldn't lock $kmlFileName");
 	}
-}
-
-
-//=== Read file out to user ==
-if ( ! $cron_flag )
-{
-	if ($options['compress'])
-	{
-		readfile($kmzFileName);
-	}
-	else
-	{
-		readfile($kmlFileName);
-	}
-}
 
 ?>

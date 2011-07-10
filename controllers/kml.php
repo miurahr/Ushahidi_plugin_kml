@@ -126,6 +126,7 @@ class Kml_Controller extends Controller
 
 		// 3.
 		//=== Caching Options ==
+		// TOD: Add something to check if new incidents have come in and re-create files only if needed?
 		$cache_secs = Kohana::config('kml.cache_secs',TRUE);
 		$cache_on = Kohana::config('kml.cache_on',TRUE);
 		if ($cache_on && file_exists($kmzFileName)
@@ -175,18 +176,29 @@ class Kml_Controller extends Controller
 		$view->kml_name = htmlspecialchars(Kohana::config('settings.site_name'));
 		$view->kml_tagline = htmlspecialchars(Kohana::config('settings.site_tagline'));
 		$view->kml_filename = $kml_filename;
-		$view->kmz_filename = $kmz_filename;
+	//	$view->kmz_filename = $kmz_filename;
 		$view->kmlFileName = $kmlFileName;
-		$view->kmzFileName = $kmzFileName;
+	//	$view->kmzFileName = $kmzFileName;
 
 		$view->items = $incident_items;
 		$view->categories = $categories;
 
-		// set use cache
-		$view->use_cache = $use_cache;
-		// set cron flag
-		$view->cron_flag = $cron_flag;
+		if (!$use_cache)
+		{
+			$view->render(FALSE);
+		}
 
-		$view->render(TRUE);
+		if ( ! $cron_flag )
+		{
+		    if (Kohana::config('kml.compress'))
+			{
+				kml::create_kmz($kmlFileName, $kmzFileName);
+				echo readfile($kmzFileName);
+			}
+			else
+			{
+				echo readfile($kmlFileName);
+			}
+		}
 	}
 }

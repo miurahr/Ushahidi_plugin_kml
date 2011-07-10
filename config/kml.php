@@ -17,6 +17,7 @@ $config['cache_secs'] = 120;  // seconds during which to serve cached file,
                             // after which re-generate on next request
 $config['cache_on'] = true;   // true  = use cache file 
                             // false = debug mode: re-generated on each req.
+$config['compress'] = true;
 
 // views options
 $config['options'] = array(
@@ -45,7 +46,6 @@ $config['options'] = array(
 	'highlight_label_scale' => 0.9,
 	'normal_icon_scale' => 0.6,
 	'highlight_icon_scale' => 0.8,
-	'compress' => true,
 );
 
 //=== Logo Details == (image file for in balloons: png/jpg/gif; suggested size: 36 x 36 pixels)
