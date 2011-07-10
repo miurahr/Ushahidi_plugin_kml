@@ -1,8 +1,5 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 // Basic configuration
-$config['kmlsite'] = null;// if you want to prepare server for kml which has 
-						// differnt url, set it here.
-// ex. $config['kmlsite'] = "http://www.yoursite.com/ushahidi/"; 
 $config['default_limit'] = 1000;
 // for google maps
 	// max file size :     3MB
@@ -23,7 +20,6 @@ $config['cache_on'] = true;   // true  = use cache file
 
 // views options
 $config['options'] = array(
-	"upload_directory" => "http://www.sinsai.info/ushahidi/". "media/uploads/",
 	'placemark_balloon_width' => "340",  // width in pixels (suggest 200 to 500)
 	'document_balloon_width' => "340",  // width in pixels (suggest 200 to 500)
 	'title_text_color' => "black",  // HTML color (works in Google Earth, ignored in Google Maps)
@@ -54,7 +50,7 @@ $config['options'] = array(
 
 //=== Logo Details == (image file for in balloons: png/jpg/gif; suggested size: 36 x 36 pixels)
 $config['logo'] = array(
-	'path' => "http://www.sinsai.info/ushahidi/" . "plugins/kml/views/",
+	'path' => "plugins/kml/views/",
 	'filename' => "sinsai_logo_36x36.png",
 	'width' => 36,
 	'height' => 36,

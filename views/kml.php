@@ -25,7 +25,7 @@ $catID_to_incidents = array();  // array with all category IDs, each with array 
 
 //=== function to write KML header ==
 function write_kml_head($kmlFile, $kml_name, $kml_tagline, $options) {
-	$urlbase = kml::get_kmlsite();
+	$urlbase = url::base();
 	$logo = Kohana::config("kml.logo");
 	$kml_head =	"" . 
 	"<?xml version='1.0' encoding='UTF-8'?>" . PHP_EOL .
@@ -40,10 +40,10 @@ function write_kml_head($kmlFile, $kml_name, $kml_tagline, $options) {
 	"			<a href='" . $urlbase . "'>" . $urlbase . "</a><br />" . PHP_EOL .
 	"			<p>Note: Reports are represented by multiple placemarks if they are in multiple categories.</p>" . PHP_EOL .
 	"			<p style='color:" . $options["date_text_color"] . "; '><strong>This kml last updated</strong>: " . gmdate("D, d M Y H:i:s") . " GMT</p>" . PHP_EOL .
-	//"			<p>Static KML file for offline use: <a href='" . $options["upload_directory"] . $options["kmz_filename"] . "'>" . $options["kmz_filename"] . "</a></p>" . PHP_EOL .
+	//"			<p>Static KML file for offline use: <a href='" . $urlbase . Kohana::config("upload.relative_directory") . "/" . $options["kmz_filename"] . "'>" . $options["kmz_filename"] . "</a></p>" . PHP_EOL .
 	"			<hr />" . PHP_EOL .
 	"			<table width='100%' cellpadding='0' cellspacing='0'><tr><td align='left'>" . PHP_EOL .
-	"				<img src='" . $logo["path"]. $logo["filename"]."' width='".$logo["width"]."' height='".$logo["height"]."' />" . PHP_EOL .
+	"				<img src='" . $urlbase . $logo["path"]. $logo["filename"]."' width='".$logo["width"]."' height='".$logo["height"]."' />" . PHP_EOL .
 	"			</td><td align='right'>" . PHP_EOL .
 	"				<a href='" . $urlbase . "'><strong>" . $urlbase . "</strong></a><br />" . PHP_EOL .
 	"				<a href='" . $urlbase . "reports/submit/'>Submit a new report</a>" . PHP_EOL .
@@ -54,7 +54,7 @@ function write_kml_head($kmlFile, $kml_name, $kml_tagline, $options) {
 	"		<Style id='style_top_document'>" . PHP_EOL .
 	"			<ListStyle>" . PHP_EOL .
 	"				<ItemIcon>" . PHP_EOL .
-	"					<href>" . htmlspecialchars($logo["path"]. $logo["filename"]) . "</href>" . PHP_EOL .
+	"					<href>" . htmlspecialchars($urlbase . $logo["path"]. $logo["filename"]) . "</href>" . PHP_EOL .
     "				</ItemIcon>" . PHP_EOL .
 	"				<maxSnippetLines>1</maxSnippetLines>" . PHP_EOL .
 	"			</ListStyle>" . PHP_EOL .
@@ -68,7 +68,7 @@ function write_kml_head($kmlFile, $kml_name, $kml_tagline, $options) {
 
 //=== function to generate StyleMap and Styles for one category's placemarks ==
 function generate_style($category, $catID_icons, $options) {
-	$urlbase = kml::get_kmlsite();
+	$urlbase = url::base();
 	$kml_style = "" .
 	"		<StyleMap id='stylemap_categoryID_" . $category->id . "'>" . PHP_EOL .
 	"			<Pair>" . PHP_EOL .
@@ -143,7 +143,7 @@ function write_folder_head($kmlFile, $category, $options) {
 
 //=== function to write placemark for one item ==
 function write_placemark($kmlFile, $item, $cat_id, $catID_data, $catID_icons, $options) {
-	$urlbase = kml::get_kmlsite();
+	$urlbase = url::base();
 	$logo = Kohana::config("kml.logo");
 
 	$kml_placemark = "" .
@@ -170,7 +170,7 @@ function write_placemark($kmlFile, $item, $cat_id, $catID_data, $catID_icons, $o
 	"						<tr><td><hr /></td></tr>" . PHP_EOL .
 	"						<tr><td>" . PHP_EOL .
 	"							<table width='100%' cellpadding='0' cellspacing='0'><tr><td align='left' width='" . $logo["width"] . "px'>" . PHP_EOL .
-	"								<img src='" . $logo["path"] . $logo["filename"] . "' width='" . $logo["width"] . "' height='" . $logo["height"] . "' />" . PHP_EOL .
+	"								<img src='" . $urlbase . $logo["path"] . $logo["filename"] . "' width='" . $logo["width"] . "' height='" . $logo["height"] . "' />" . PHP_EOL .
 	"							</td><td colspan='2' align='right'>" . PHP_EOL .
 	"								<a href='" . $urlbase . "'><strong>" . $urlbase . "</strong></a><br />" . PHP_EOL .
 	"								<a href='" . $urlbase . "reports/submit/'>Submit a new report</a>" . PHP_EOL .
@@ -190,7 +190,7 @@ function write_placemark($kmlFile, $item, $cat_id, $catID_data, $catID_icons, $o
 
 //=== function to generate Extended Data section (if enabled in options) ==
 function generate_extended_data($item, $cat_id, $categories_string, $options) {
-	$urlbase = kml::get_kmlsite();
+	$urlbase = url::base();
 	$kml_extended_data = "";
 	if ($options["extended_data"]) {
 		$kml_extended_data = "" .
@@ -235,7 +235,7 @@ function write_kml_foot($kmlFile) {
 //=== Function to Process Categories ==
 //    ...(to build icons array, generate kml styles, and build data arrays for categories and subcat mapping)
 function process_categories($kmlFile, $categories, &$catID_icons, &$kml_styles, &$catID_data, &$cat_to_subcats, $options) {
-	$urlbase = kml::get_kmlsite();
+	$urlbase = url::base();
 	// Iterate through categories...
 	foreach ($categories as $cat) {
 		// Write array of catIDs to icons
@@ -243,9 +243,9 @@ function process_categories($kmlFile, $categories, &$catID_icons, &$kml_styles, 
 		// if category image is set, then construct icon URLs using image and add to relevant array
 		if(isset($cat->category_image)) {
 			// if so, use it for the icon
-			$cat_icons["placemark"] = htmlspecialchars($urlbase.'media/uploads/'.$cat->category_image);
-			$cat_icons["folder"] = htmlspecialchars($urlbase.'media/uploads/'.$cat->category_image);
-			$cat_icons["cat_string"] = htmlspecialchars($urlbase.'media/uploads/'.$cat->category_image_thumb);
+			$cat_icons["placemark"] = htmlspecialchars($urlbase.Kohana::config("upload.relative_directory") . "/" .$cat->category_image);
+			$cat_icons["folder"] = htmlspecialchars($urlbase.Kohana::config("upload.relative_directory")."/".$cat->category_image);
+			$cat_icons["cat_string"] = htmlspecialchars($urlbase.Kohana::config("upload.relative_directory")."/".$cat->category_image_thumb);
 		}
 		// otherwise, construct icons using swatch generator
 		else {

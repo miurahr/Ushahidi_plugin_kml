@@ -16,20 +16,6 @@
 */
 class kml_Core {
 
-	function get_kmlsite()
-	{
-		if (Kohana::config("kml.kmlsite") != null AND 
-			strlen(Kohana::config("kml.kmlsite")) > 7 )
-		{
-			$urlbase = Kohana::config("kml.kmlsite");
-		}
-		else
-		{
-			$urlbase = url::base();
-		}
-		return $urlbase;
-	}
-
 	//=== function to get domain name from URL string
 	function get_domain($url) {
 		// parse host out of URL
@@ -60,7 +46,7 @@ class kml_Core {
 
 	//=== function to generate media string for inclusion in placemark balloon ==
 	function get_item_media($item) {
-		$urlbase = kml::get_kmlsite();
+		$urlbase = url::base();
 		$item_media = array();
 		$item_media_string = "";
 		$close_table = false;
@@ -74,8 +60,8 @@ class kml_Core {
 						$item_media["image"] = $media->media_link;
 						$item_media["image_medium"] = $media->media_medium;
 						$item_media["image_thumb"] = $media->media_thumb;
-						$item_media_string .= "<td align='center'><a href='" . $urlbase . "media/uploads/" . $media->media_link . "'><img src='" . $urlbase . "media/uploads/" . $media->media_thumb . "' /></a>";
-						$item_media_string .= "<br /><a style='font-size:0.8em; ' href='" . $urlbase . "media/uploads/" . $media->media_link . "'>full size</a></td>";
+						$item_media_string .= "<td align='center'><a href='" . $urlbase . Kohana::config("upload.relative_directory") . "/" .  $media->media_link . "'><img src='" . $urlbase . Kohana::config("upload.relative_directory") . "/" . $media->media_thumb . "' /></a>";
+						$item_media_string .= "<br /><a style='font-size:0.8em; ' href='" . $urlbase . Kohana::config("upload.relative_directory") . "/" . $media->media_link . "'>full size</a></td>";
 						break;
 					case 2:
 						$item_media["video"] = $media->media_link;
@@ -110,7 +96,7 @@ class kml_Core {
 
 	//=== function to generate Categories String for inclusion in placemark balloon ==
 	static function generate_categories_string($item, $catID_data, $catID_icons, $options) {
-		$urlbase = kml::get_kmlsite();
+		$urlbase = url::base();
 		$categories_string = "";
 		$cat_icon_size = $options["cat_icon_size"];
 
