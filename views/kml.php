@@ -24,7 +24,7 @@ $catID_to_incidents = array();  // array with all category IDs, each with array 
 //=============================================================================================
 
 //=== function to write KML header ==
-function write_kml_head($kmlFile, $kml_name, $kml_tagline, $options) {
+function kml_head($kml_name, $kml_tagline, $options) {
 	$urlbase = url::base();
 	$logo = Kohana::config("kml.logo");
 	$kml_head =	"" . 
@@ -62,12 +62,11 @@ function write_kml_head($kmlFile, $kml_name, $kml_tagline, $options) {
 	"				<text><![CDATA[<html><body><h2 style='color:" . $options["title_text_color"] . "; '>$[name]</h2>$[description]</body></html>]]></text>" . PHP_EOL .
 	"			</BalloonStyle>" . PHP_EOL .
 	"		</Style>" . PHP_EOL;	
-	fwrite($kmlFile, $kml_head);
-	return true;
+	return $kml_head;
 }
 
-//=== function to generate StyleMap and Styles for one category's placemarks ==
-function generate_style($category, $catID_icons, $options) {
+//=== function to generate StyleMap and Styles for one category's placemarks and folders ==
+function kml_style($category, $catID_icons, $options) {
 	$urlbase = url::base();
 	$kml_style = "" .
 	"		<StyleMap id='stylemap_categoryID_" . $category->id . "'>" . PHP_EOL .
@@ -110,12 +109,8 @@ function generate_style($category, $catID_icons, $options) {
 	"				<text><![CDATA[<html><body><h2 style='color:" . $options["title_text_color"] . "; '>$[name]</h2>$[description]</body></html>]]></text>" . PHP_EOL .
 	"			</BalloonStyle>" . PHP_EOL .
 	"		</Style>" . PHP_EOL;
-	return $kml_style;
-}
 
-//=== function to generate Style for a folder for one category ==
-function generate_folder_style($category, $catID_icons, $options) {
-	$kml_style = "" .
+	$kml_style .= "" .
 	"		<Style id='style_categoryID_" . $category->id . "_folder'>" . PHP_EOL .
 	"			<ListStyle>" . PHP_EOL .
 	"				<ItemIcon>" . PHP_EOL .
@@ -128,7 +123,7 @@ function generate_folder_style($category, $catID_icons, $options) {
 }
 
 //=== function to write Folder header for one category ==
-function write_folder_head($kmlFile, $category, $options) {
+function folder_head($category, $options) {
 	$category_snippet = kml::get_category_folder_head_snippet($category);
 	$kml_folder_head = "" . 
 	"		<Folder id='folder_categoryID_" . $category->id . "'>" . PHP_EOL .
@@ -137,12 +132,11 @@ function write_folder_head($kmlFile, $category, $options) {
 	"			<visibility>" . $options["visibility"] . "</visibility>" . PHP_EOL .
 	"			<open>0</open>" . PHP_EOL .
 	"			<styleUrl>#style_categoryID_" . $category->id . "_folder</styleUrl>" . PHP_EOL;
-	fwrite($kmlFile, $kml_folder_head);
-	return true;
+	return $kml_folder_head;
 }
 
 //=== function to write placemark for one item ==
-function write_placemark($kmlFile, $item, $cat_id, $catID_data, $catID_icons, $options) {
+function placemark($item, $cat_id, $catID_data, $catID_icons, $options) {
 	$urlbase = url::base();
 	$logo = Kohana::config("kml.logo");
 
@@ -184,8 +178,7 @@ function write_placemark($kmlFile, $item, $cat_id, $catID_data, $catID_icons, $o
 	"					<coordinates>" . $item->location->longitude . "," . $item->location->latitude . "</coordinates>" . PHP_EOL .
 	"				</Point>" . PHP_EOL .
 	"			</Placemark>" . PHP_EOL;
-	fwrite($kmlFile, $kml_placemark);
-	return true;
+	return $kml_placemark;
 }
 
 //=== function to generate Extended Data section (if enabled in options) ==
@@ -211,30 +204,27 @@ function generate_extended_data($item, $cat_id, $categories_string, $options) {
 }
 
 //=== function to write Folder footer for one category ==
-function write_folder_foot($kmlFile) {
+function folder_foot() {
 	$kml_folder_foot = "" . 
 	"		</Folder>" . PHP_EOL;
-	fwrite($kmlFile, $kml_folder_foot);
-	return true;
+	return $kml_folder_foot;
 }
 
 //=== function to write KML footer ==
-function write_kml_foot($kmlFile) {
+function kml_foot() {
 	$kml_foot = "" .
 	"	</Document>" . PHP_EOL .
 	"</kml>" . PHP_EOL;
-	fwrite($kmlFile, $kml_foot);
-	return true;
+	return $kml_foot;
 }
 
 
 //=============================================================================================
 // Action Functions above, Logic Functions below
 //=============================================================================================
-
 //=== Function to Process Categories ==
 //    ...(to build icons array, generate kml styles, and build data arrays for categories and subcat mapping)
-function process_categories($kmlFile, $categories, &$catID_icons, &$kml_styles, &$catID_data, &$cat_to_subcats, $options) {
+function process_categories($categories, &$catID_icons, &$kml_styles, &$catID_data, &$cat_to_subcats, $options) {
 	$urlbase = url::base();
 	// Iterate through categories...
 	foreach ($categories as $cat) {
@@ -257,8 +247,7 @@ function process_categories($kmlFile, $categories, &$catID_icons, &$kml_styles, 
 		$catID_icons[$cat->id] = $cat_icons;
 		
 		// Write KML styles for category's placemarks and folder
-		$kml_styles .= generate_style($cat, $catID_icons, $options);
-		$kml_styles .= generate_folder_style($cat, $catID_icons, $options);
+		$kml_styles .= kml_style($cat, $catID_icons, $options);
 		
 		// Generate/Fill category data array (for easy cat data retrieval by cat id)
 		$catID_data[$cat->id] = $cat;
@@ -287,8 +276,16 @@ function process_categories($kmlFile, $categories, &$catID_icons, &$kml_styles, 
 }
 
 
-//=== Function with folder and placemark generation logic
-function write_kml_data($kmlFile, $items, $catID_to_incidents, $cat_to_subcats, $catID_data, $catID_icons, $options) {
+//=============================================================================================
+// Generate and Write KML 
+//=============================================================================================
+
+	// we need to compress data after views generation.
+	// we write it file where controller demand once.
+	process_categories($categories, $catID_icons, $kml_styles, $catID_data, $cat_to_subcats, $options);
+
+	fwrite($kmlFile, kml_head($kml_name, $kml_tagline, $options));
+	fwrite($kmlFile, $kml_styles);
 
 	//=== Iterate through incidents (build arrays of incidents in each category)
 	foreach($items as $incident) {
@@ -312,61 +309,34 @@ function write_kml_data($kmlFile, $items, $catID_to_incidents, $cat_to_subcats, 
 	foreach ($cat_to_subcats as $cat_id => $subcats) {
 
 		// For each top-level category, write folder header
-		write_folder_head($kmlFile, $catID_data[$cat_id], $options);
+		fwrite($kmlFile, folder_head($catID_data[$cat_id], $options));
 		// Iterate through subcategories (if any) for that top-level category
 		foreach ($subcats as $subcat) {
 			// For each subcategory, write folder header
-			write_folder_head($kmlFile, $subcat, $options);
+			fwrite($kmlFile, folder_head($subcat, $options));
 
 			// If this subcategory has one or more incidents tagged with it...
 			if(isset($catID_to_incidents[$subcat->id])) {
 				// then iterate through incidents (if any) attached to that cat ID
 				foreach ($catID_to_incidents[$subcat->id] as $item) {
 					// write incident/item's placemark
-					write_placemark($kmlFile, $item, $subcat->id, $catID_data, $catID_icons, $options);
+					fwrite($kmlFile, placemark($item, $subcat->id, $catID_data, $catID_icons, $options));
 				} 
 			}
 			// Write folder footer for the sub category
-			write_folder_foot($kmlFile);
+			fwrite($kmlFile, folder_foot());
 		}
 		// If the parent category has one or more incidents tagged with it...
 		if(isset($catID_to_incidents[$cat_id])) {
 			// then iterate through incidents attached to that cat ID
 			foreach($catID_to_incidents[$cat_id] as $item) {
 				// write incident/item's placemark
-				write_placemark($kmlFile, $item, $cat_id, $catID_data, $catID_icons, $options);
+				fwrite($kmlFile, placemark($item, $cat_id, $catID_data, $catID_icons, $options));
 			} 
 		}
 		// Write folder footer for top-level category
-		write_folder_foot($kmlFile);
+		fwrite($kmlFile, folder_foot());
 	}
-}
-
-
-//=============================================================================================
-// Generate and Write KML file to uploads directory
-//=============================================================================================
-
-	kohana::log('info', "generating new kml file");
-	$kmlFile = fopen($kmlFileName, "w");
-	if (flock($kmlFile, LOCK_EX)) { // do an exclusive lock
-		kohana::log('info', "Got lock on $kmlFileName");
-		
-		process_categories($kmlFile, $categories, $catID_icons, $kml_styles, $catID_data, $cat_to_subcats, $options);
-		
-		write_kml_head($kmlFile, $kml_name, $kml_tagline, $options);
-		
-		fwrite($kmlFile, $kml_styles);
-		
-		write_kml_data($kmlFile, $items, $catID_to_incidents, $cat_to_subcats, $catID_data, $catID_icons, $options);
-		
-		write_kml_foot($kmlFile);
-		
-		flock($kmlFile, LOCK_UN); // release the lock
-		fclose($kmlFile);
-		kohana::log('info', " ...locked and closed $kmlFileName");
-	} else {
-		kohana::log('error', "Couldn't lock $kmlFileName");
-	}
+	fwrite($kmlFile, kml_foot());
 
 ?>

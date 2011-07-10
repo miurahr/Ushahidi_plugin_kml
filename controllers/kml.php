@@ -185,7 +185,20 @@ class Kml_Controller extends Controller
 
 		if (!$use_cache)
 		{
-			$view->render(FALSE);
+			kohana::log('info', "generating new kml file");
+			$kmlFile = fopen($kmlFileName, "w");
+			if (flock($kmlFile, LOCK_EX)) { // do an exclusive lock
+				kohana::log('info', "Got lock on $kmlFileName");
+				$view->kmlFile = $kmlFile;
+
+				$view->render(FALSE);
+
+				flock($kmlFile, LOCK_UN); // release the lock
+				fclose($kmlFile);
+				kohana::log('info', " ...locked and closed $kmlFileName");
+			} else {
+				kohana::log('error', "Couldn't lock $kmlFileName");
+   			}
 		}
 
 		if ( ! $cron_flag )
